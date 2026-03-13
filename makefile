@@ -2,7 +2,7 @@ install:
 	poetry install
 
 run:
-	poetry run streamlit run src/rental_analytics_model/app.py
+	poetry run streamlit run app.py
 
 format:
 	poetry run black src
