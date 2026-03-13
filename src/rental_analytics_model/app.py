@@ -9,7 +9,7 @@ from rental_analytics_model import utils
 def app():
 
     st.title("Recibos Gestão de Frotas")
-    st.divider()
+    # st.divider()
 
     st.markdown("""
     <style>
