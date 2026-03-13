@@ -1,0 +1,81 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# distribuição / build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# cache de ferramentas
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# =========================
+# Virtual environments
+# =========================
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# Poetry
+# =========================
+poetry.toml
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# IDEs
+# =========================
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# =========================
+# Sistema operacional
+# =========================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Streamlit
+# =========================
+
+# arquivos locais de configuração
+.streamlit/secrets.toml
+
+# =========================
+# Dados temporários
+# =========================
+*.csv
+*.xlsx
+*.parquet
+*.db
+
+# =========================
+# Node (caso use frontend)
+# =========================
+node_modules/
