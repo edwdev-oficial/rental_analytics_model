@@ -13,5 +13,3 @@ def app():
     st.dataframe(df)
 
     st.line_chart(df.set_index("Disponibilidade"))
-
-app()

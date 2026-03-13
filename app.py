@@ -1,3 +1,3 @@
-from rental_analytics_model import app
+from rental_analytics_model.app import app
 
-print(app)
+app()
