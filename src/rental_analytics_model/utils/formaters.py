@@ -1,10 +1,9 @@
 import pandas as pd
-import locale
-
-locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
 
 def format_brl(valor):
-    return locale.format_string("%.2f", valor, grouping=True)
+    if valor is None:
+        return ""
+    return f"{valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 def convert_moeda_br_str_to_number(value):
    return float(value.replace('.', '').replace(',', '.'))
