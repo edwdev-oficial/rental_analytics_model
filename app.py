@@ -7,6 +7,15 @@ st.set_page_config(
     layout='wide'
 )
 
+st.markdown("""
+<style>
+.block-container {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # region ocultar menu footer e header
 hide_streamlit_style = """
 <style>

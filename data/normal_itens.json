@@ -1,0 +1,146 @@
+[
+    {
+        "Descrição":"Mart. demolidor TE 700-AVR 220V",
+        "Tipo":"Ferramenta",
+        "Linha":"Rompedor",
+        "Modelo":"TE-700"
+    },
+    {
+        "Descrição":"Mart. demolidor TE 800-AVR 220V",
+        "Tipo":"Ferramenta",
+        "Linha":"Rompedor",
+        "Modelo":"TE-800"
+    },
+    {
+        "Descrição":"Martelo perf. TE 3-ML 220V mala",
+        "Tipo":"Ferramenta",
+        "Linha":"Martelete",
+        "Modelo":"TE-3"
+    },
+    {
+        "Descrição":"Mart. demolidor TE 500-AVR 220V",
+        "Tipo":"Ferramenta",
+        "Linha":"Rompedor",
+        "Modelo":"TE-500"
+    },
+    {
+        "Descrição":"Mart. demolidor TE 2000-AVR 230V",
+        "Tipo":"Ferramenta",
+        "Linha":"Rompedor",
+        "Modelo":"TE-2000"
+    },
+    {
+        "Descrição":"Bateria B 22\/5.2 Li-ion",
+        "Tipo":"Acessório",
+        "Linha":"Bateria",
+        "Modelo":"B 22\/5.2"
+    },
+    {
+        "Descrição":"Aparaf\/berbequim bat. SF 6H-A22 ma",
+        "Tipo":"Ferramenta",
+        "Linha":"Parafusadeira",
+        "Modelo":"SF 6H-22"
+    },
+    {
+        "Descrição":"Mart. demolidor TE 3000-AVR 230V c",
+        "Tipo":"Ferramenta",
+        "Linha":"Rompedor",
+        "Modelo":"TE-3000"
+    },
+    {
+        "Descrição":"Mart. demolidor TE 500 220V",
+        "Tipo":"Ferramenta",
+        "Linha":"Rompedor",
+        "Modelo":"TE-500"
+    },
+    {
+        "Descrição":"Bateria B 36\/5.2",
+        "Tipo":"Acessório",
+        "Linha":"Bateria",
+        "Modelo":"B 36\/5.2"
+    },
+    {
+        "Descrição":"Laser rotativo PR 2-HS A12",
+        "Tipo":"Ferramenta",
+        "Linha":"Laser",
+        "Modelo":"PR-2 HS"
+    },
+    {
+        "Descrição":"Mart. demolidor TE 1000-AVR 230V c",
+        "Tipo":"Ferramenta",
+        "Linha":"Rompedor",
+        "Modelo":"TE-1000"
+    },
+    {
+        "Descrição":"Bateria B 22\/4.0 Li-ion",
+        "Tipo":"Acessório",
+        "Linha":"Bateria",
+        "Modelo":"B 22\/4.0"
+    },
+    {
+        "Descrição":"Mart. demolidor TE 3000-AVR 230V",
+        "Tipo":"Ferramenta",
+        "Linha":"Rompedor",
+        "Modelo":"TE-3000"
+    },
+    {
+        "Descrição":"Bateria B 12-30 Li-ion",
+        "Tipo":"Acessório",
+        "Linha":"Bateria",
+        "Modelo":"B 12-30"
+    },
+    {
+        "Descrição":"Carreg. bateria C 4\/12-50 230V caixa",
+        "Tipo":"Acessório",
+        "Linha":"Carregador",
+        "Modelo":"C 4\/12-50"
+    },
+    {
+        "Descrição":"Martelo perf. TE 1 220V mala",
+        "Tipo":"Ferramenta",
+        "Linha":"Martelete",
+        "Modelo":"TE-1"
+    },
+    {
+        "Descrição":"Bateria B 22-85 Li-ion",
+        "Tipo":"Acessório",
+        "Linha":"Bateria",
+        "Modelo":"B 22-85"
+    },
+    {
+        "Descrição":"Bateria B 22-110 Li-ion",
+        "Tipo":"Acessório",
+        "Linha":"Bateria",
+        "Modelo":"B 22-110"
+    },
+    {
+        "Descrição":"Aparaf\/berbequim bat. SF 6H-22 caix",
+        "Tipo":"Ferramenta",
+        "Linha":"Parafusadeira",
+        "Modelo":"SF 6H-22"
+    },
+    {
+        "Descrição":"Aparaf\/berbequim bat. SF 6H-22 mal",
+        "Tipo":"Ferramenta",
+        "Linha":"Parafusadeira",
+        "Modelo":"SF 6H-22"
+    },
+    {
+        "Descrição":"Carreg. bateria C 6-22 220V caixa",
+        "Tipo":"Acessório",
+        "Linha":"Carregador",
+        "Modelo":"C 6-22"
+    },
+    {
+        "Descrição":"Módulo de dados IC CDM-22",
+        "Tipo":"Acessório",
+        "Linha":"Módulo",
+        "Modelo":"Módulo"
+    },
+    {
+        "Descrição":"Rebarb.\/Esmerilh. AG 180-20P",
+        "Tipo":"Ferramenta",
+        "Linha":"Esmerilhadeira",
+        "Modelo":"AG 180-20P"
+    }
+]
