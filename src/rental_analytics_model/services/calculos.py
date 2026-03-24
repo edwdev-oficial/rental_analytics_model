@@ -8,7 +8,7 @@ def calcular_faturamento_frota(
     df: pd.DataFrame,
     tx_disp_use,
     tx_ocup_use,
-    dias_semana
+    dias_semana=0
 ) -> pd.DataFrame:
     """
     Calcula o faturamento da frota.
