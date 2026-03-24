@@ -17,8 +17,15 @@ from src.rental_analytics_model.utils import formaters
 # =========================================================
 def show_dash(df, familia, modelo):
 
+    # st.dataframe(df)
+
+    # =========================================================
+    # region SESSION STATE
+    # =========================================================
     if 'categoria_selecionada' not in st.session_state:
         st.session_state.categoria_selecionada = None
+    # =========================================================
+    # endregion
 
     # =========================================================
     # region PALETA DE CORES
@@ -217,10 +224,10 @@ def show_dash(df, familia, modelo):
     # =========================================================
     # endregion
 
-    st.dataframe(df_group_filter_by_linha_modelo)
-    total_equipamentos = df_group_filter_by_linha_modelo['Qt.'].sum()
-    valor_total_gf = df_group_filter_by_linha_modelo['Subtotal c/imp'].sum()
-    st.write(f'Qtd: {total_equipamentos} - Total G.F. {formaters.format_brl(valor_total_gf, True)} ')
+    # st.dataframe(df_group_filter_by_linha_modelo)
+    # total_equipamentos = df_group_filter_by_linha_modelo['Qt.'].sum()
+    # valor_total_gf = df_group_filter_by_linha_modelo['Subtotal c/imp'].sum()
+    # st.write(f'Qtd: {total_equipamentos} - Total G.F. {formaters.format_brl(valor_total_gf, True)} ')
 
     # =========================================================
     # region INDICADORES DERIVADOS
@@ -228,9 +235,10 @@ def show_dash(df, familia, modelo):
     df_faturamento = calculos.calcular_faturamento_frota(
         df_group_filter_by_linha_modelo,
         tx_disp_use[1],
-        tx_ocup_use[1]
+        tx_ocup_use[1],
+        st.session_state.dias_semana
     )
-    # st.dataframe(df_faturamento)
+
     # =========================================================
     # endregion
 
@@ -247,6 +255,7 @@ def show_dash(df, familia, modelo):
     # write_data('Valor Gestão de Frotas', valor_gf)
 
 
+    # st.dataframe(df_faturamento)
     faturamento_potencial_total = df_faturamento["faturamento_potencial_total"].sum()
     # write_data('Faturamento potencial total', faturamento_potencial_total)
 

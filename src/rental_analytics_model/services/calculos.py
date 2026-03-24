@@ -1,5 +1,4 @@
 import pandas as pd
-import streamlit as st
 import numpy as np
 
 # =========================================================
@@ -8,7 +7,8 @@ import numpy as np
 def calcular_faturamento_frota(
     df: pd.DataFrame,
     tx_disp_use,
-    tx_ocup_use
+    tx_ocup_use,
+    dias_semana
 ) -> pd.DataFrame:
     """
     Calcula o faturamento da frota.
@@ -27,10 +27,11 @@ def calcular_faturamento_frota(
 
     DISPONIBILIDADE = tx_disp_use / 100
     OCUPACAO = tx_ocup_use / 100
-    DIAS_UTEIS = np.round((52 /12) * float(st.session_state.dias_semana)).astype(int)
-    SEMANAS_POSSIVEIS = 4
-    QUINZENAS_POSSIVEIS = 2
-    MENSAL_POSSIVEL = 1
+    DIAS_UTEIS = np.round((52 /12) * float(dias_semana)).astype(int)
+
+    SEMANAS_POSSIVEIS = 4 if dias_semana else 0
+    QUINZENAS_POSSIVEIS = 2 if dias_semana else 0
+    MENSAL_POSSIVEL = 1 if dias_semana else 0
 
 
     df_calc = df

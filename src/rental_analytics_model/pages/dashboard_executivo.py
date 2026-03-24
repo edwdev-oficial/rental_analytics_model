@@ -17,36 +17,36 @@ def show (lista_unicos, df_valores_locacao, df_contratos):
     # st.write(f'Receita total: {formaters.format_brl(total_receita, True)}')
 
 
-    # df_recibos = load_data_recibos(lista_unicos, df_valores_locacao, df_contratos)
+    df_recibos = load_data_recibos(lista_unicos, df_valores_locacao, df_contratos)
 
-    # familias = ['']
-    # familias.extend(sorted(
-    #     list(
-    #         df_recibos[df_recibos['Tipo'] == 'Ferramenta']
-    #         ['Linha']
-    #         .unique()
-    #     )
-    # ))
-    # familia = st.sidebar.selectbox(
-    #     'Familia',
-    #     familias,
-    #     index=5
-    # )
+    familias = ['']
+    familias.extend(sorted(
+        list(
+            df_recibos[df_recibos['Tipo'] == 'Ferramenta']
+            ['Linha']
+            .unique()
+        )
+    ))
+    familia = st.sidebar.selectbox(
+        'Familia',
+        familias,
+        index=5
+    )
 
-    # modelos = ['']
-    # modelos.extend(sorted(
-    #     list(
-    #         df_recibos[df_recibos['Linha'] == familia]
-    #         ['Modelo']
-    #         .unique()
-    #     )
-    # ))
+    modelos = ['']
+    modelos.extend(sorted(
+        list(
+            df_recibos[df_recibos['Linha'] == familia]
+            ['Modelo']
+            .unique()
+        )
+    ))
 
-    # modelo = st.sidebar.selectbox(
-    #     'Modelo',
-    #     modelos,
-    #     index=0
-    # )
+    modelo = st.sidebar.selectbox(
+        'Modelo',
+        modelos,
+        index=0
+    )
 
-    # show_dash(df_recibos, familia, modelo)
+    show_dash(df_recibos, familia, modelo)
 
