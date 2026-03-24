@@ -21,9 +21,6 @@ def calcular_faturamento_frota(
     Retorna:
     - DataFrame com colunas calculadas
     """
-    # df_calc = preparar_dataframe(df)
-
-    # st.write(st.session_state)
 
     DISPONIBILIDADE = tx_disp_use / 100
     OCUPACAO = tx_ocup_use / 100
