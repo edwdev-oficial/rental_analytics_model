@@ -2055,6 +2055,21 @@ sql = ["SQLAlchemy (>=2.0.0)"]
 starlette = ["anyio (>=4.0.0)", "itsdangerous (>=2.1.2)", "python-multipart (>=0.0.10)", "starlette (>=0.40.0)", "uvicorn (>=0.30.0)", "websockets (>=12.0.0)"]
 
 [[package]]
+name = "streamlit-option-menu"
+version = "0.4.0"
+description = "streamlit-option-menu is a simple Streamlit component that allows users to select a single item from a list of options in a menu."
+optional = false
+python-versions = ">=3.6"
+groups = ["main"]
+files = [
+    {file = "streamlit-option-menu-0.4.0.tar.gz", hash = "sha256:48ec69d59e547fa2fa4bfae001620df8af56a80de2f765ddbb9fcbfb84017129"},
+    {file = "streamlit_option_menu-0.4.0-py3-none-any.whl", hash = "sha256:a55fc7554047b6db371595af2182e435b8a2c715ee6124e8543685bd4670b07e"},
+]
+
+[package.dependencies]
+streamlit = ">=1.36"
+
+[[package]]
 name = "streamlit-pdf"
 version = "2.0.1"
 description = "A Streamlit component for viewing PDF files"
@@ -2069,6 +2084,22 @@ files = [
 [package.extras]
 devel = ["playwright (==1.49.*)", "pytest (==7.4.0)", "pytest-playwright-snapshot (==1.0)", "pytest-rerunfailures (==12.0)", "requests (==2.31.0)", "wheel"]
 with-streamlit = ["streamlit (>=1.51.0)"]
+
+[[package]]
+name = "streamlit-plotly-events"
+version = "0.0.6"
+description = "Plotly chart component for Streamlit that also allows for events to bubble back up to Streamlit."
+optional = false
+python-versions = ">=3.6"
+groups = ["main"]
+files = [
+    {file = "streamlit-plotly-events-0.0.6.tar.gz", hash = "sha256:1fe25dbf0e5d803aeb90253be04d7b395f5bcfdf3c654f96ff3c19424e7f9582"},
+    {file = "streamlit_plotly_events-0.0.6-py3-none-any.whl", hash = "sha256:e63fbe3c6a0746fdfce20060fc45ba5cd97805505c332b27372dcbd02c2ede29"},
+]
+
+[package.dependencies]
+plotly = ">=4.14.3"
+streamlit = ">=0.63"
 
 [[package]]
 name = "tenacity"
@@ -2247,4 +2278,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.15"
-content-hash = "5a370efe40c4bb3e7fb11f5e464428d4cc703864226213e66691e359e688d61b"
+content-hash = "7798a23b9245d2bd2b951ef53bf7a1e63aab0124a983ed0bc242f87139eaa339"

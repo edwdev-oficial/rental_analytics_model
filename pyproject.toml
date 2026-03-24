@@ -17,6 +17,8 @@ xlsxwriter = "^3.2.0"
 python-dateutil = "^2.9.0"
 pdfplumber = "^0.11.9"
 streamlit-pdf = "^2.0.1"
+streamlit-plotly-events = "^0.0.6"
+streamlit-option-menu = "^0.4.0"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
