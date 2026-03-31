@@ -1,5 +1,5 @@
 # =========================================================
-# region Importes
+# region Imports
 # =========================================================
 import streamlit as st
 import plotly.express as px
@@ -9,23 +9,25 @@ import pandas as pd
 
 from rental_analytics_model.services import calculos
 from src.rental_analytics_model.utils import formaters
-# =========================================================
 # endregion
+# =========================================================
 
 # =========================================================
 # region main
 # =========================================================
-def show_dash(df, familia, modelo):
-
-    # st.dataframe(df)
+def show_dash(df, df_pq_maquinas, familia, modelo):
 
     # =========================================================
     # region SESSION STATE
     # =========================================================
     if 'categoria_selecionada' not in st.session_state:
         st.session_state.categoria_selecionada = None
-    # =========================================================
+    if 'valor_gf' not in st.session_state:
+        st.session_state.valor_gf = 0.0
+    if 'potencial_total_faturamento' not in st.session_state:
+        st.session_state.potencial_total_faturamento = 0.0
     # endregion
+    # =========================================================
 
     # =========================================================
     # region PALETA DE CORES
@@ -38,85 +40,78 @@ def show_dash(df, familia, modelo):
     COLOR_WHITE = "#ffffff"
     COLOR_BLACK = "#000000"
     COLOR_BG = "#f5f3ef"
-
     PLOTLY_SEQUENCE = [COLOR_RED, COLOR_WINE, COLOR_TAUPE, COLOR_DARK, COLOR_BEIGE]
-    # =========================================================    
     # endregion
+    # =========================================================    
 
     # =========================================================
     # region CSS CUSTOMIZADO
     # =========================================================
-    st.markdown(
-        f"""
-        <style>
-            .stApp {{
-                background-color: {COLOR_WHITE};
-            }}
+    # st.markdown(
+    #     f"""
+    #     <style>
+    #         .stApp {{
+    #             background-color: {COLOR_WHITE};
+    #         }}
 
-            .block-container {{
-                padding-top: 2.5rem;
-                padding-bottom: 1.5rem;
-            }}
+    #         # .block-container {{
+    #         #     padding-top: 2.5rem;
+    #         #     padding-bottom: 1.5rem;
+    #         # }}
 
-            h1, h2, h3, h4 {{
-                color: {COLOR_DARK};
-            }}
+    #         # h1, h2, h3, h4 {{
+    #         #     color: {COLOR_DARK};
+    #         # }}
 
-            section[data-testid="stSidebar"] {{
-                # background-color: {COLOR_RED};
-                # border-right: 1px solid #ddd;
-            }}
+    #         # section[data-testid="stSidebar"] {{
+    #         #     # background-color: {COLOR_RED};
+    #         #     # border-right: 1px solid #ddd;
+    #         # }}
 
-            # .kpi-card {{
-            #     background-color: {COLOR_BG};
-            #     border-radius: 14px;
-            #     padding: 16px 18px;
-            #     border-left: 8px solid {COLOR_RED};
-            #     box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-            #     margin-bottom: 10px;
-            # }}
+    #         # .kpi-card {{
+    #         #     background-color: {COLOR_BG};
+    #         #     border-radius: 14px;
+    #         #     padding: 16px 18px;
+    #         #     border-left: 8px solid {COLOR_RED};
+    #         #     box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    #         #     margin-bottom: 10px;
+    #         # }}
 
-            # .kpi-title {{
-            #     font-size: 13px;
-            #     color: {COLOR_TAUPE};
-            #     margin-bottom: 6px;
-            #     font-weight: 600;
-            #     text-transform: uppercase;
-            #     letter-spacing: 0.3px;
-            # }}
+    #         # .kpi-title {{
+    #         #     font-size: 13px;
+    #         #     color: {COLOR_TAUPE};
+    #         #     margin-bottom: 6px;
+    #         #     font-weight: 600;
+    #         #     text-transform: uppercase;
+    #         #     letter-spacing: 0.3px;
+    #         # }}
 
-            .kpi-value {{
-                font-size: 28px;
-                color: {COLOR_DARK};
-                font-weight: 700;
-                line-height: 1.1;
-            }}
+    #         # .kpi-value {{
+    #         #     font-size: 28px;
+    #         #     color: {COLOR_DARK};
+    #         #     font-weight: 700;
+    #         #     line-height: 1.1;
+    #         # }}
 
-            .kpi-sub {{
-                font-size: 12px;
-                color: {COLOR_WINE};
-                margin-top: 6px;
-            }}
+    #         # .section-card {{
+    #         #     background-color: {COLOR_BG};
+    #         #     padding: 14px;
+    #         #     border-radius: 16px;
+    #         #     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    #         #     margin-bottom: 14px;
+    #         # }}
 
-            .section-card {{
-                background-color: {COLOR_BG};
-                padding: 14px;
-                border-radius: 16px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-                margin-bottom: 14px;
-            }}
-
-            div[data-testid="stDataFrame"] {{
-                background-color: {COLOR_BG};
-                border-radius: 12px;
-                padding: 4px;
-            }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    # =========================================================
+    #         # div[data-testid="stDataFrame"] {{
+    #         #     background-color: {COLOR_BG};
+    #         #     border-radius: 12px;
+    #         #     padding: 4px;
+    #         # }}
+    #     </style>
+    #     """,
+    #     unsafe_allow_html=True
+    # )
     # endregion
+    # =========================================================
 
     # =========================================================
     # region funções
@@ -148,19 +143,24 @@ def show_dash(df, familia, modelo):
             )
         )
         return fig
-    # =========================================================
     # endregion
+    # =========================================================
 
     # =========================================================
     # region df_group_filter_by_linha_modelo
     # =========================================================
+    df_origem = df if not df.empty else df_pq_maquinas if not df_pq_maquinas.empty else pd.DataFrame()
+    if df_origem.empty:
+        st.warning('Nenhum dado disponível para exibir o dashboard. Carregue os arquivos necessários.')
+        st.stop()
+    # st.write(df_origem) #debug
     df_group_filter_by_linha_modelo = (
-    (df[
-        (df['Linha'].str.contains(familia, na=False))
+    (df_origem[
+        (df_origem['Linha'].str.contains(familia, na=False))
         &
-        (df['Modelo'].str.contains(modelo, na=False))
+        (df_origem['Modelo'].str.contains(modelo, na=False))
     ])
-        .groupby('Modelo', as_index=False)
+        .groupby(['Período', 'Modelo'], as_index=False)
         .agg({
             'Qt.': 'sum',
             'Subtotal c/imp': 'sum',
@@ -169,10 +169,15 @@ def show_dash(df, familia, modelo):
             'quinzena':'first',
             'mes':'first',
         })
-    ).sort_values('Subtotal c/imp', ascending=False)
-    # st.dataframe(df_group_filter_by_linha_modelo)
-    # =========================================================
+    )
+    df_group_filter_by_linha_modelo['inicio_periodo'] = pd.to_datetime(df_group_filter_by_linha_modelo['Período'], format='%m/%Y')
+    df_group_filter_by_linha_modelo['fim_periodo'] = df_group_filter_by_linha_modelo['inicio_periodo'] + pd.offsets.MonthEnd(0)
+    df_group_filter_by_linha_modelo['intervalo_dias'] = (df_group_filter_by_linha_modelo['fim_periodo'] - df_group_filter_by_linha_modelo['inicio_periodo']).dt.days + 1
+    # st.dataframe(df_group_filter_by_linha_modelo) #DEBUG
+#     # # st.session_state.valor_gf = df_group_filter_by_linha_modelo['Subtotal c/imp'].sum()
+#     # # st.write(formaters.format_brl(st.session_state.valor_gf))
     # endregion
+    # =========================================================
 
     # =========================================================
     # region SLIDERS
@@ -221,13 +226,27 @@ def show_dash(df, familia, modelo):
 
     # st.write(tx_disp_use[1])
     # st.write(tx_ocup_use[1])
-    # =========================================================
     # endregion
+    # =========================================================
 
-    # st.dataframe(df_group_filter_by_linha_modelo)
-    # total_equipamentos = df_group_filter_by_linha_modelo['Qt.'].sum()
-    # valor_total_gf = df_group_filter_by_linha_modelo['Subtotal c/imp'].sum()
-    # st.write(f'Qtd: {total_equipamentos} - Total G.F. {formaters.format_brl(valor_total_gf, True)} ')
+    with st.expander('Detalhes Dev'):
+        st.write('df_group_filter_by_linha_modelo', df_group_filter_by_linha_modelo)
+        st.write(f'Valor total G.F. {df_group_filter_by_linha_modelo["Subtotal c/imp"].sum():,.2f}')
+        st.write(f'Qtd total: {df_group_filter_by_linha_modelo["Qt."].sum()}')
+        df_total_equipamentos = (df_group_filter_by_linha_modelo.groupby('Período', as_index=False)['Qt.'].sum())
+        df_total_equipamentos['inicio_periodo'] = pd.to_datetime(df_total_equipamentos['Período'], format='%m/%Y')
+        df_total_equipamentos['fim_periodo'] = df_total_equipamentos['inicio_periodo'] + pd.offsets.MonthEnd(0)
+        df_total_equipamentos['intervalo_dias'] = (df_total_equipamentos['fim_periodo'] - df_total_equipamentos['inicio_periodo']).dt.days + 1
+        df_total_equipamentos['locacoes_possiveis'] = df_total_equipamentos['Qt.'] * df_total_equipamentos['intervalo_dias']
+        df_total_equipamentos = df_total_equipamentos[['inicio_periodo', 'fim_periodo', 'Qt.', 'locacoes_possiveis']]
+        df_total_equipamentos['possiveis_disp'] = df_total_equipamentos['locacoes_possiveis'] * (tx_disp_use[1] / 100)
+        df_total_equipamentos['possiveis_ocup'] = df_total_equipamentos['locacoes_possiveis'] * (tx_ocup_use[1] / 100)
+        st.dataframe(df_total_equipamentos)
+        total_dias_possiveis = df_total_equipamentos['locacoes_possiveis'].sum()
+        st.write(f'Total de dias de locação possíveis: {total_dias_possiveis}')
+        st.write(f'Total de dias após disponibilidade: {df_total_equipamentos["possiveis_disp"].sum()}')
+        st.write(f'Total de dias após ocupação: {df_total_equipamentos["possiveis_ocup"].sum()}')
+
 
     # =========================================================
     # region INDICADORES DERIVADOS
@@ -238,9 +257,9 @@ def show_dash(df, familia, modelo):
         tx_ocup_use[1],
         st.session_state.dias_semana
     )
-
-    # =========================================================
+    st.write(df_faturamento)
     # endregion
+    # =========================================================
 
     # =========================================================
     # region TOTAIS
@@ -249,24 +268,26 @@ def show_dash(df, familia, modelo):
         st.write(f'{title}: {formaters.format_brl(data)}')
 
     qt_total = int(df_faturamento["Qt."].sum())
-    # st.write(f'Qtd total: {qt_total}')
+    st.write(f'Qtd total: {qt_total}')
 
     valor_gf = df_faturamento['Subtotal c/imp'].sum()
+    st.session_state.valor_gf = valor_gf
     # write_data('Valor Gestão de Frotas', valor_gf)
 
 
     # st.dataframe(df_faturamento)
     faturamento_potencial_total = df_faturamento["faturamento_potencial_total"].sum()
-    # write_data('Faturamento potencial total', faturamento_potencial_total)
+    st.session_state.potencial_total_faturamento = faturamento_potencial_total
+    write_data('Faturamento potencial total', faturamento_potencial_total)
 
     faturamento_apos_disp_total = df_faturamento["faturamento_apos_disponibilidade"].sum()
-    # write_data('Faturamento total após disponibilidade', faturamento_apos_disp_total)
+    write_data('Faturamento total após disponibilidade', faturamento_apos_disp_total)
 
     gap_apos_disponibilidade = faturamento_potencial_total - faturamento_apos_disp_total
     # write_data('Gap após disponibilidade', gap_apos_disponibilidade)
 
     faturamento_real_total = df_faturamento["faturamento_real"].sum()
-    # write_data('Faturamento total real', faturamento_real_total)
+    write_data('Faturamento total real', faturamento_real_total)
 
     gap_total = df_faturamento["gap_faturamento"].sum()
     # write_data('Gap total', gap_total)
@@ -279,8 +300,8 @@ def show_dash(df, familia, modelo):
 
     perda_ocup_total = df_faturamento["perda_por_baixa_ocupacao"].sum()
     # write_data('Perda por baixa ocupação', perda_ocup_total)
-    # =========================================================
     # endregion
+    # =========================================================
 
     # =========================================================
     # region DASHBOARD EXECUTIVO
@@ -289,32 +310,27 @@ def show_dash(df, familia, modelo):
     # =========================================================
     # region CARDS
     # =========================================================
-    k1, k2, k3, k4, k5, k6, k7 = st.columns(7)
+    k1, k2, k3, k4, k5, k6 = st.columns(6)
 
     with k1:
-        st.markdown(make_kpi_card("Máquinas", f"{qt_total}", "Tamanho da frota filtrada"), unsafe_allow_html=True)
-
-    with k2:
         st.markdown(make_kpi_card("Potencial Total", formaters.format_brl(faturamento_potencial_total), "Capacidade máxima teórica"), unsafe_allow_html=True)
 
-    with k3:
+    with k2:
         st.markdown(make_kpi_card("Após Disponibilidade", formaters.format_brl(faturamento_apos_disp_total), "Potencial após perda operacional"), unsafe_allow_html=True)
 
-    with k4:
+    with k3:
         st.markdown(make_kpi_card("Gap Operacional", formaters.format_brl(gap_apos_disponibilidade), "Real ÷ potencial"), unsafe_allow_html=True)
 
-    with k5:
+    with k4:
         st.markdown(make_kpi_card("Após Ocupação", formaters.format_brl(faturamento_real_total), "Receita efetivamente capturada"), unsafe_allow_html=True)
 
-    with k6:
+    with k5:
         st.markdown(make_kpi_card("Gap Comercial", formaters.format_brl(gap_total), "Disponível, mas não monetizado"), unsafe_allow_html=True)
 
-    with k7:
+    with k6:
         st.markdown(make_kpi_card("Utilização Econômica", pct(utilizacao_media), "Real ÷ potencial"), unsafe_allow_html=True)
-
-
-    # =========================================================
     # endregion
+    # =========================================================
 
     # =========================================================
     # region GRAFICOS
@@ -384,8 +400,8 @@ def show_dash(df, familia, modelo):
         )        
         with card_2:
             st.plotly_chart(fig_comp, width='stretch')
-    # =========================================================
     # endregion
+    # =========================================================
 
     # =========================================================
     # region COL3 COL4
@@ -427,9 +443,8 @@ def show_dash(df, familia, modelo):
         )        
         with card_4:
             st.plotly_chart(fig_rpm, width='stretch')
-
-    # =========================================================
     # endregion
+    # =========================================================
 
     # =========================================================
     # region COL5 COL6
@@ -488,18 +503,17 @@ def show_dash(df, familia, modelo):
         )
         with card_6:
             st.plotly_chart(fig_scatter, width='stretch')
-
-    # =========================================================
     # endregion
-
     # =========================================================
+
     # endregion
+    # =========================================================
 
     # =========================================================
     # region COMPOSIÇÃO DAS PERDAS    
     # =========================================================
+    st.divider()
     st.subheader("Composição das perdas")
-
     waterfall_df = pd.DataFrame({
         "Etapa": ["Potencial Total", "Perda por Indisponibilidade", "Após Disponibilidade", "Perda por Baixa Ocupação", "Faturamento Real"],
         "Valor": [faturamento_potencial_total, -perda_indisp_total, faturamento_apos_disp_total, -perda_ocup_total, faturamento_real_total]
@@ -520,6 +534,56 @@ def show_dash(df, familia, modelo):
     
     st.plotly_chart(fig_waterfall, width='stretch')
 
+    valor_total_gf = df_group_filter_by_linha_modelo['Subtotal c/imp'].sum()
+    if valor_total_gf:
+        st.write(f'Valor G.F. {valor_total_gf}')
+
+    # st.subheader("Composição das perdas")
+
+    valor_total_gf = df_group_filter_by_linha_modelo['Subtotal c/imp'].sum()
+    lucro_total = faturamento_real_total - valor_total_gf
+
+    waterfall_df = pd.DataFrame({
+        "Etapa": [
+            "Potencial Total",
+            "Perda por Indisponibilidade",
+            "Após Disponibilidade",
+            "Perda por Baixa Ocupação",
+            "Faturamento Real",
+            "Custo G.F.",
+            "Lucro"
+        ],
+        "Valor": [
+            faturamento_potencial_total,
+            -perda_indisp_total,
+            faturamento_apos_disp_total,
+            -perda_ocup_total,
+            faturamento_real_total,
+            -valor_total_gf,
+            lucro_total
+        ]
+    })
+
+    fig_waterfall2 = go.Figure(go.Waterfall(
+        name="Fluxo de Receita",
+        orientation="v",
+        measure=["absolute", "relative", "total", "relative", "total", "relative", "total"],
+        x=waterfall_df["Etapa"],
+        y=waterfall_df["Valor"],
+        connector={"line": {"color": COLOR_RED}},
+        increasing={"marker": {"color": COLOR_WINE}},
+        decreasing={"marker": {"color": COLOR_TAUPE}},
+        totals={"marker": {"color": COLOR_RED}}
+    ))
+
+    fig_waterfall2 = apply_theme(fig_waterfall2, "Da Capacidade Teórica ao Lucro")
+    st.plotly_chart(fig_waterfall2, width='stretch')    
+    # endregion
+    # =========================================================
+
+    # =========================================================
+    # region TABELA ANALÍTICA
+    # =========================================================    
     st.subheader("Tabela Analítica")
 
     df_show = df_faturamento[[
@@ -555,13 +619,13 @@ def show_dash(df, familia, modelo):
         width='stretch',
         hide_index=True
     )
-    # =========================================================
     # endregion
-
     # =========================================================
-    # endregion
 
-# =========================================================
+    # endregion
+    # =========================================================
+
 # endregion
+# =========================================================
 
 

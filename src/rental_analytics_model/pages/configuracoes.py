@@ -53,6 +53,6 @@ def show():
 
     )
 
-    st.write(f"Dias na semana: {st.session_state["dias_semana"]}")
-    st.write(f"Taxa de disponibilidade: {st.session_state["tx_disponibilidade"]} %")
-    st.write(f"tx_ocupacao: {st.session_state["tx_ocupacao"]} %")
+    # st.write(f"Dias na semana: {st.session_state["dias_semana"]}")
+    # st.write(f"Taxa de disponibilidade: {st.session_state["tx_disponibilidade"]} %")
+    # st.write(f"tx_ocupacao: {st.session_state["tx_ocupacao"]} %")

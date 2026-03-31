@@ -9,6 +9,8 @@
     --COLOR_BG: #f5f3ef;
     --COLOR_GREEN: #008000;
     --COLOR_CARD: #F0F2F6;
+    /* --COLOR_CARD: rgb(215, 206, 189, 0.2); */
+    /* --COLOR_CARD: rgb(82, 79, 83, 0.2); */
 }
 
 .block-container {
@@ -74,6 +76,12 @@ section[data-testid="stSidebar"] {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.3px;
+}
+
+.kpi-sub {
+    font-size: 12px;
+    color: var(--COLOR_WINE);
+    margin-top: 6px;
 }
 
 .st-key-card1,

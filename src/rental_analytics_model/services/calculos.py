@@ -24,7 +24,6 @@ def calcular_faturamento_frota(
 
     DISPONIBILIDADE = tx_disp_use / 100
     OCUPACAO = tx_ocup_use / 100
-    DIAS_UTEIS = np.round((52 /12) * float(dias_semana)).astype(int)
 
     SEMANAS_POSSIVEIS = 4 if dias_semana else 0
     QUINZENAS_POSSIVEIS = 2 if dias_semana else 0
@@ -33,19 +32,20 @@ def calcular_faturamento_frota(
 
     df_calc = df
 
+
     if DISPONIBILIDADE is not None:
         df_calc["DISPONIBILIDADE"] = DISPONIBILIDADE
 
     if OCUPACAO is not None:
         df_calc["OCUPACAO"] = OCUPACAO
 
-    df_calc['mix_dia'] = 0.812
-    df_calc['mix_semana'] = 0.115        
-    df_calc['mix_quinzena'] = 0.0403        
-    df_calc['mix_mes'] = 0.0327
+    df_calc['mix_dia'] = 0.758865
+    df_calc['mix_semana'] = 0.134752        
+    df_calc['mix_quinzena'] = 0.024823        
+    df_calc['mix_mes'] = 0.08156
 
     # Potencial mensal por modalidade
-    df_calc["potencial_dia"] = df_calc["dia"] * DIAS_UTEIS * df_calc["mix_dia"]
+    df_calc["potencial_dia"] = df_calc["dia"] * df_calc['intervalo_dias'] * df_calc["mix_dia"]
     df_calc["potencial_semana"] = df_calc["semana"] * SEMANAS_POSSIVEIS * df_calc["mix_semana"]
     df_calc["potencial_quinzena"] = df_calc["quinzena"] * QUINZENAS_POSSIVEIS * df_calc["mix_quinzena"]
     df_calc["potencial_mes"] = df_calc["mes"] * MENSAL_POSSIVEL * df_calc["mix_mes"]

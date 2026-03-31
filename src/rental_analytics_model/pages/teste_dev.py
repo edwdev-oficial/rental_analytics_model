@@ -1,135 +1,381 @@
-import streamlit as st
+# ========================================================
+# region IMPORTS
+# ========================================================
+import math
+import numpy as np
 import pandas as pd
+import streamlit as st
 import plotly.graph_objects as go
 
 from rental_analytics_model.utils import formaters
+from rental_analytics_model.services.data_recibos import load_data_recibos
+# endregion
+# ========================================================
 
-def test(sesseion_state):
+def test():
 
     from rental_analytics_model.services.data_recibos import load_data_recibos
+    from rental_analytics_model.services.calculos import calcular_faturamento_frota
 
+# ========================================================
+# region TITLE
+# ========================================================
     st.title('Teste')
-    st.divider()
 
     with st.expander('Sesseion State'):
-        st.write(sesseion_state)
+        st.write(st.session_state)
 
-    lista_unicos = sesseion_state.files
-
-    df_valores_locacao = sesseion_state.df_valores_locacao.copy()
-    
-    df_contratos = sesseion_state.df_contratos.copy()
-    df_contratos['locacao'] = df_contratos['locacao'] + pd.DateOffset(years=1)
-    df_contratos['devolucao'] = df_contratos['devolucao'] + pd.DateOffset(years=1)
-
-    df_recibos = load_data_recibos(lista_unicos, df_valores_locacao, df_contratos)
-    df_recibos['periodo_dt'] = pd.to_datetime(df_recibos['Período'], format='%m/%Y')
-
-    min_date_recibos = df_recibos['periodo_dt'].min()
-    max_date_recibos = (df_recibos['periodo_dt'].max() + pd.DateOffset(months=1)) - pd.DateOffset(days=1)
-
-    #%% FILTROS
-    df_contratos = df_contratos[
-        (df_contratos['locacao'] >= min_date_recibos)
-        &
-        (df_contratos['locacao'] <= max_date_recibos)
-    ].reset_index(drop=True)
-
-    # st.write(f'min_date_recibos: {min_date_recibos} | max_date_recibos {max_date_recibos}')
-
-    #%% SHOW DATAFRAMES
-    st.write('Recibos G.F.')
-    st.dataframe(df_recibos)
     st.divider()
-    
-    st.write('Valores Locação')
-    st.dataframe(df_valores_locacao)
-    st.divider()
-    
-    st.write('Contratos')
-    st.dataframe(df_contratos)
-    st.divider()
+# endregion
+# ========================================================
 
-    #%% CÁLCULOS
-    valor_total_recibos = df_recibos['Subtotal c/imp'].sum()
-    valor_total_contratos = df_contratos['valor'].sum()
-    margem_de_contribuicao = (valor_total_contratos - valor_total_recibos) / valor_total_contratos
-    markup = (valor_total_contratos - valor_total_recibos ) / valor_total_recibos * 100
-    lucro_bruto = valor_total_contratos - valor_total_recibos
+# ========================================================
+# region GAUGE_GRAPH
+# ========================================================
+    def gauge_graph():
+        lista_unicos = session_state.files
 
-    #%% RESUMO
-    st.subheader('Resumo')
-    st.write(f'Valor total dos recibos {formaters.format_brl(valor_total_recibos, True)}')
-    st.write(f'Valor total de contratos: {formaters.format_brl(valor_total_contratos, True)}')
-    st.write(f'Margem de contribuição: {round(margem_de_contribuicao * 100, 1)}%')
-    st.write(f'Markup: {round(markup, 1)}')
-    st.write(f'Lucro bruto: {formaters.format_brl(lucro_bruto, True)}')
-    st.divider()
+        df_valores_locacao = session_state.df_valores_locacao.copy()
+        
+        df_contratos = session_state.df_contratos.copy()
+        df_contratos['locacao'] = df_contratos['locacao'] + pd.DateOffset(years=1)
+        df_contratos['devolucao'] = df_contratos['devolucao'] + pd.DateOffset(years=1)
 
-    #%% INSITE
-    st.subheader('💡 Insites')
-    st.html(f"""
-        <div>
-            <p>🔴 Ponto de equilíbrio total</p>
-            <p>🔴 Ponto de equilíbrio por máquina</p>
-        </div>
-    """)
+        df_recibos = load_data_recibos(lista_unicos, df_valores_locacao, df_contratos)
+        df_recibos['periodo_dt'] = pd.to_datetime(df_recibos['Período'], format='%m/%Y')
 
-    col1, col2, col3, col4 = st.columns(4)
+        min_date_recibos = df_recibos['periodo_dt'].min()
+        max_date_recibos = (df_recibos['periodo_dt'].max() + pd.DateOffset(months=1)) - pd.DateOffset(days=1)
 
-    with col1:
-        tx_ocupacao = 12
+        #%% FILTROS
+        df_contratos = df_contratos[
+            (df_contratos['locacao'] >= min_date_recibos)
+            &
+            (df_contratos['locacao'] <= max_date_recibos)
+        ].reset_index(drop=True)
 
-        fig = go.Figure(
-            go.Indicator(
-                mode='gauge+number',
-                value=tx_ocupacao,
-                title={'text': 'Taxa de ocupação % Break Even'},
-                gauge={
-                    "axis": {"range": [0, 100]},
-                    "bar": {"thickness": 0.3},
-                    "steps": [
-                        {"range": [0, 12], "color": "red"},
-                        {"range": [12, 55], "color": "#a6a6a6"},
-                        {"range": [55, 100], "color": "#595959"},
-                    ],
-                    "threshold": {
-                        "line": {"color": "yellow", "width": 4},
-                        "thickness": 0.8,
-                        "value": 12
+        # st.write(f'min_date_recibos: {min_date_recibos} | max_date_recibos {max_date_recibos}')
+
+        #%% SHOW DATAFRAMES
+        st.write('Recibos G.F.')
+        st.dataframe(df_recibos)
+        st.divider()
+        
+        st.write('Valores Locação')
+        st.dataframe(df_valores_locacao)
+        st.divider()
+        
+        st.write('Contratos')
+        st.dataframe(df_contratos)
+        st.divider()
+
+        #%% CÁLCULOS
+        valor_total_recibos = df_recibos['Subtotal c/imp'].sum()
+        valor_total_contratos = df_contratos['valor'].sum()
+        margem_de_contribuicao = (valor_total_contratos - valor_total_recibos) / valor_total_contratos
+        markup = (valor_total_contratos - valor_total_recibos ) / valor_total_recibos * 100
+        lucro_bruto = valor_total_contratos - valor_total_recibos
+
+        #%% RESUMO
+        st.subheader('Resumo')
+        st.write(f'Valor total dos recibos {formaters.format_brl(valor_total_recibos, True)}')
+        st.write(f'Valor total de contratos: {formaters.format_brl(valor_total_contratos, True)}')
+        st.write(f'Margem de contribuição: {round(margem_de_contribuicao * 100, 1)}%')
+        st.write(f'Markup: {round(markup, 1)}')
+        st.write(f'Lucro bruto: {formaters.format_brl(lucro_bruto, True)}')
+        st.divider()
+
+        #%% INSITE
+        st.subheader('💡 Insites')
+        st.html(f"""
+            <div>
+                <p>🔴 Ponto de equilíbrio total</p>
+                <p>🔴 Ponto de equilíbrio por máquina</p>
+            </div>
+        """)
+
+        valor_gf = st.session_state.valor_gf
+        # valor_gf = 300000
+        potencial_tot_faturamento = st.session_state.potencial_total_faturamento
+        tx_disp = st.session_state.tx_disponibilidade / 100
+        st.write(f'Valor G.F.: {formaters.format_brl(valor_gf)}')
+        st.write(f'Potencial total de faturamento: {formaters.format_brl(potencial_tot_faturamento)}')
+        st.write(f'Taxa de disponibilidade: {tx_disp * 100}%')
+
+        tx_ocup_mark_up = (valor_gf / potencial_tot_faturamento / tx_disp) * 100
+        st.write(f'Taxa ocupação mínima para mark up: {round(tx_ocup_mark_up, 1)}%')
+
+        col1, col2, col3, col4 = st.columns(4)
+
+
+        with col1:
+            tx_ocupacao = tx_ocup_mark_up
+
+            fig = go.Figure(
+                go.Indicator(
+                    mode='gauge+number',
+                    value=tx_ocupacao,
+                    title={'text': 'Taxa de ocupação % Break Even'},
+                    gauge={
+                        "axis": {"range": [0, 100]},
+                        "bar": {"thickness": 0.22},
+                        "steps": [
+                            {"range": [0, tx_ocupacao], "color": "#d2051e"},
+                            {"range": [tx_ocupacao, 55], "color": "rgba(82, 79, 83, 0.2)"},
+                            {"range": [55, 100], "color": "rgba(82, 79, 83, 0.6)"},
+                        ],
+                        "threshold": {
+                            "line": {"color": "yellow", "width": 1},
+                            "thickness": 0.5,
+                            "value": tx_ocupacao
+                        }
                     }
-                }
+                )
             )
+
+            # with st.container(border=True):
+            st.plotly_chart(fig, key='gauge')
+        
+        
+        with col2:
+            tx_ocupacao = 60
+
+            fig = go.Figure(
+                go.Indicator(
+                    mode='gauge+number',
+                    value=tx_ocupacao,
+                    title={'text': 'Taxa de ocupação % Efetiva'},
+                    gauge={
+                        "axis": {"range": [0, 100]},
+                        "bar": {"thickness": 0.22},
+                        "steps": [
+                            {"range": [0, 12], "color": "#d2051e"},
+                            {"range": [12, 55], "color": "rgba(82, 79, 83, 0.2)"},
+                            {"range": [55, 100], "color": "rgba(82, 79, 83, 0.6)"},
+                        ],
+                        "threshold": {
+                            "line": {"color": "yellow", "width": 1},
+                            "thickness": 0.5,
+                            "value": 12
+                        }
+                    }
+                )
+            )
+
+            # with st.container(border=True):
+            st.plotly_chart(fig, key='gauge2')
+    
+# endregion
+# ========================================================
+    # gauge_graph()
+
+# ========================================================
+# region TAXA_OCUPACAO
+# ========================================================
+    def taxa_ocupacao():
+        st.subheader('Teste Taxa Ocupação', divider='red')
+        
+        df_recibos = session_state.df_recibos.copy()
+        df_recibos.rename(columns={'Linha': 'familia', 'Modelo': 'modelo'}, inplace=True)
+        df_recibos = df_recibos[df_recibos['familia'] == 'Rompedor']
+        st.write('Recibos')
+        st.dataframe(df_recibos)
+
+        df_qtd_by_linha_modelo = (
+            df_recibos
+            .groupby(['familia', 'modelo'], as_index=False)['Qt.']
+            .sum()
+        )
+        st.dataframe(df_qtd_by_linha_modelo)
+
+        df_contratos = session_state.df_contratos.copy()
+        st.write('Contratos')
+        st.dataframe(df_contratos)
+
+        # calculos
+        qtd_maquinas = df_qtd_by_linha_modelo['Qt.'].sum()
+        date_start = df_contratos['locacao'].min()
+        date_end = df_contratos['locacao'].max()
+        qtd_meses = (date_end.year - date_start.year) * 12 + (date_end.month - date_start.month) + 1
+        dias_uteis = qtd_meses * 26
+        capacidade_total = qtd_maquinas * dias_uteis
+        disponibilidade = .8
+        capacidade_disponivel = capacidade_total * disponibilidade
+        dias_locados = df_contratos['periodo_dias'].sum()
+        tx_ocupacao = dias_locados / capacidade_disponivel
+
+        st.subheader('Resumo')
+        st.write(f'Qtd máquinas: {qtd_maquinas}')
+        st.write(f'Dias úteis: {dias_uteis}')
+        st.write(f'Capacidade total: {capacidade_total}')
+        st.write(f'Disponibilidade: {disponibilidade * 100}%')
+        st.write(f'Capacidade disponível: {capacidade_disponivel}')
+        st.write(f'Taxa de ocupação: {tx_ocupacao * 100}%')
+
+        # st.write(f'Total de período em dias: {total_periodo_dias}')
+
+# endregion
+# ========================================================
+    # taxa_ocupacao()
+
+# ========================================================
+# region FILTER_TEST
+# ========================================================
+    def filter_test():
+        
+        itens = [
+            {'name': 'abc'},
+            {'name': 'abcd'},
+            {'name': 'abcde'},
+        ]
+
+        itens_filter = [i for i in itens if 'abcd' in i['name']]
+        if itens_filter:
+            st.write(itens_filter)
+
+# endregion
+# ========================================================
+    # filter_test()
+
+# ========================================================
+# region PREPARAR_CONTRATOS
+# ========================================================
+
+    @st.cache_data
+    def gerar_excel(df):
+        import io
+        buffer = io.BytesIO()
+        df.to_excel(buffer, index=False)
+        buffer.seek(0)
+        return buffer
+
+    @st.cache_data
+    def calcular_periodos_df(df):
+        # garante datetime
+        # df['locacao'] = pd.to_datetime(df['locacao'], format='%d/%m/%Y %H:%M')
+        # df['devolucao'] = pd.to_datetime(df['devolucao'], format='%d/%m/%Y %H:%M')
+        df['locacao'] = pd.to_datetime(df['locacao'], errors='coerce')
+        df['devolucao'] = pd.to_datetime(df['devolucao'], errors='coerce')
+
+        # 🔥 cálculo vetorizado (igual sua regra de calendário)
+        dias_total = (
+            df['devolucao'].dt.normalize() - df['locacao'].dt.normalize()
+        ).dt.days
+
+        # mínimo 1 dia
+        dias_total = dias_total.clip(lower=1)
+
+        df['dias'] = dias_total
+
+        df['mes'] = dias_total // 30
+        dias_restantes = dias_total % 30
+
+        df['quinzena'] = dias_restantes // 15
+        dias_restantes = dias_restantes % 15
+
+        df['semana'] = dias_restantes // 7
+        df['dia'] = dias_restantes % 7
+
+        return df        
+
+    def converter_coluna_datetime(col):
+        col = col.astype("string").str.strip()
+
+        # remove vazios
+        amostra = col[col.notna() & (col != "")]
+        
+        if amostra.empty:
+            return pd.to_datetime(col, errors="coerce")
+
+        primeiro_valor = amostra.iloc[0]
+
+        formatos_possiveis = [
+            "%d-%m-%Y",
+            "%d-%m-%Y %H:%M",
+            "%d-%m-%Y %H:%M:%S",
+            "%Y-%m-%d",
+            "%Y-%m-%d %H:%M",
+            "%Y-%m-%d %H:%M:%S",
+        ]
+
+        formato_detectado = None
+
+        for fmt in formatos_possiveis:
+            try:
+                pd.to_datetime(primeiro_valor, format=fmt)
+                formato_detectado = fmt
+                break
+            except (ValueError, TypeError):
+                continue
+
+        if formato_detectado is None:
+            raise ValueError(f"Formato de data não reconhecido: {primeiro_valor}")
+
+        return pd.to_datetime(col, format=formato_detectado, errors="coerce")
+
+    def preparar_contratos():
+        df_contratos = st.session_state.df_contratos
+        df_contratos = df_contratos.fillna('')
+        df_contratos['familia'] = 'Rompedor'
+        df_contratos.rename(columns={
+            'Contrato': 'numero_contrato',
+            'NumPat': 'patrimonio',
+            'DescPat': 'modelo',
+            'VlTotalFaturado': 'valor',
+            'VlTotalSemDesc': 'valor',
+            'QTDE_DIAS': 'dias_no_periodo_original'
+        }, inplace=True)
+        
+        # # para os contratos da mil máquinas
+        # df_contratos['marca'] = 'Hilti'
+
+        # para os contratos da lorenzon
+        df_contratos['marca'] = np.where(
+            df_contratos['modelo'].str.contains('HILTI', case=False, na=False),
+            'Hilti',
+            'Outros'
+        )
+        df_contratos[['locacao', 'devolucao']] = df_contratos['PeriodoItem'].str.split(' a ', expand=True)
+
+        df_contratos['modelo'] = df_contratos['modelo'].str.replace('hilti', '', case=False)
+        df_contratos['modelo'] = df_contratos['modelo'].str.replace('rompedor', '', case=False)
+        df_contratos['modelo'] = df_contratos['modelo'].str.replace(' ', '', case=False)
+        df_contratos['locacao'] = df_contratos['locacao'].astype(str)
+        df_contratos['devolucao'] = df_contratos['devolucao'].astype(str)
+        df_contratos['locacao'] = df_contratos['locacao'].str.replace('/', '-')
+        df_contratos['devolucao'] = df_contratos['devolucao'].str.replace('/', '-')
+        df_contratos['locacao'] = converter_coluna_datetime(df_contratos['locacao'])
+        df_contratos['devolucao'] = converter_coluna_datetime(df_contratos['devolucao'])
+        df_contratos['numero_contrato'] = df_contratos['numero_contrato'].astype(str)
+        # df_contratos['locacao'] = df_contratos['locacao'].replace('/', '-')
+        # df_contratos = df_contratos[['numero_contrato', 'patrimonio', 'familia', 'marca', 'modelo', 'locacao', 'devolucao', 'dias_no_periodo_original', 'valor']].fillna('')
+
+        # df_contratos = df_contratos[
+        #     pd.to_datetime(df_contratos['locacao'], format='%d/%m/%Y %H:%M') < pd.to_datetime(df_contratos['devolucao'], format='%d/%m/%Y %H:%M')
+        # ]
+
+        df_contratos = df_contratos[['numero_contrato', 'patrimonio', 'familia', 'marca', 'modelo', 'locacao', 'devolucao', 'valor']]
+
+        st.dataframe(df_contratos)
+        buffer = gerar_excel(df_contratos)
+        st.download_button(
+            label="Baixar Excel",
+            data=buffer,
+            file_name="contratos.xlsx"
         )
 
-        # with st.container(border=True):
-        st.plotly_chart(fig, key='gauge')
-    
-    
-    with col2:
-        tx_ocupacao = 60
+    # preparar_contratos()
 
-        fig = go.Figure(
-            go.Indicator(
-                mode='gauge+number',
-                value=tx_ocupacao,
-                title={'text': 'Taxa de ocupação % Efetiva'},
-                gauge={
-                    "axis": {"range": [0, 100]},
-                    "bar": {"thickness": 0.3},
-                    "steps": [
-                        {"range": [0, 12], "color": "#d9d9d9"},
-                        {"range": [12, 55], "color": "#a6a6a6"},
-                        {"range": [55, 100], "color": "#595959"},
-                    ],
-                    "threshold": {
-                        "line": {"color": "red", "width": 4},
-                        "thickness": 0.8,
-                        "value": 12
-                    }
-                }
-            )
-        )
+    def incluir_periodos():
+        df_contratos = st.session_state.df_contratos
 
-        # with st.container(border=True):
-        st.plotly_chart(fig, key='gauge2')
+        df = df_contratos.copy() 
+        df_periodo = calcular_periodos_df(df)
+        df_periodo = df_periodo[['numero_contrato', 'patrimonio', 'familia', 'marca', 'modelo', 'locacao', 'devolucao', 'dias', 'mes', 'quinzena', 'semana', 'dia', 'valor']]
+        df_periodo = df_periodo.fillna('')
+        st.dataframe(df_periodo)
+        st.write(f'Dias: {df_periodo['dias'].sum()}')
+
+# endregion
+# ========================================================
+    incluir_periodos()

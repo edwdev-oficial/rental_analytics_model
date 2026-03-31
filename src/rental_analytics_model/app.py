@@ -8,6 +8,8 @@ def app():
     # ==========================================
     if "files" not in st.session_state:
         st.session_state.files = []
+    if "df_pq_maquinas" not in st.session_state:
+        st.session_state.df_pq_maquinas = None     
     if "df_valores_locacao" not in st.session_state:
         st.session_state.df_valores_locacao = None
     if "df_contratos" not in st.session_state:
@@ -19,10 +21,12 @@ def app():
     # region Funções de Carregamento das Páginas
     # ==========================================
     def carregar_dados():
+        pass
         from rental_analytics_model.pages import carregar_dados
-        files, df_valores_locacao, df_contratos = carregar_dados.show(st.session_state.files)
-        if files is not None:
-            st.session_state.files = files
+        lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos = carregar_dados.show()
+        if lista_unicos is not None:
+            st.session_state.files = lista_unicos
+            st.session_state.df_pq_maquinas = df_pq_maquinas
             st.session_state.df_valores_locacao = df_valores_locacao
             st.session_state.df_contratos = df_contratos
 
@@ -30,16 +34,26 @@ def app():
         from rental_analytics_model.pages import configuracoes
         configuracoes.show()
 
+    def taxa_ocupacao():
+        from rental_analytics_model.pages import taxa_ocupacao
+        taxa_ocupacao.show(
+            st.session_state.df_pq_maquinas,
+            st.session_state.df_valores_locacao,
+            st.session_state.df_contratos
+        )        
+
     def dashboard_executivo():
         from rental_analytics_model.pages import dashboard_executivo
+        # st.write(st.session_state.df_pq_maquinas) #DEBUG
         dashboard_executivo.show(
             st.session_state.files,
+            st.session_state.df_pq_maquinas,
             st.session_state.df_valores_locacao,
             st.session_state.df_contratos
         )
     def test_dev():
         from rental_analytics_model.pages import teste_dev
-        teste_dev.test(st.session_state)        
+        teste_dev.test()
     # ==========================================
     # endregion
 
@@ -52,6 +66,7 @@ def app():
             [
                 "Carregar Dados",
                 "Configurações",
+                "Taxa de Ocupação",
                 "Dashboard Executivo",
                 "---",
                 "Teste Dev"
@@ -59,6 +74,7 @@ def app():
             icons=[
                 "database-fill-down",
                 "gear-fill",
+                "bar-chart-fill",
                 "speedometer",
                 None,
                 "tools"
@@ -94,6 +110,7 @@ def app():
     pages = {
         "Carregar Dados": carregar_dados,
         "Configurações": configuracoes,
+        "Taxa de Ocupação": taxa_ocupacao,
         "Dashboard Executivo": dashboard_executivo,
         "Teste Dev": test_dev
     }

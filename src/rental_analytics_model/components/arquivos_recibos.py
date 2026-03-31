@@ -1,48 +1,96 @@
+# ========================================================
+# region IMPORTS
+# ========================================================
+import io
 import hashlib
+import pandas as pd
 import streamlit as st
 from src.rental_analytics_model.services.valores_locacao import load_xlsx
-import io
+
+from rental_analytics_model.services import clear_df
+
+# endregion
+# ========================================================
 
 def arquivos_recebidos(arquivos):
 
-        if 'arquivos_unicos' not in st.session_state:
-            st.session_state.arquivos_unicos = {}
+    # ========================================================
+    # region ARQUIVOS UNICOS
+    # ========================================================
+    if 'arquivos_unicos' not in st.session_state:
+        st.session_state.arquivos_unicos = {}
 
-        for file in arquivos:
-            pdf_bytes = file.getvalue()
-            file_hash = hashlib.md5(pdf_bytes).hexdigest()
+    for file in arquivos:
+        pdf_bytes = file.getvalue()
+        file_hash = hashlib.md5(pdf_bytes).hexdigest()
 
-            if file_hash not in st.session_state.arquivos_unicos:
-                st.session_state.arquivos_unicos[file_hash] = file
+        if file_hash not in st.session_state.arquivos_unicos:
+            st.session_state.arquivos_unicos[file_hash] = file
 
 
-        lista_unicos = list(st.session_state.arquivos_unicos.values())
-        # st.write(lista_unicos)
+    lista_unicos = list(st.session_state.arquivos_unicos.values())
+    # endregion
+    # ========================================================
 
+    # ========================================================
+    # region FATURAS GF
+    # ========================================================
+    pdf_files = [f for f in lista_unicos if f.type == "application/pdf"]
+    if pdf_files:
         with st.expander("Faturas Gestão de Frotas"):
-            pdf_files = [f for f in lista_unicos if f.type == "application/pdf"]
-            if len(pdf_files) > 0:
-                abas = st.tabs([f"Recibo {lista_unicos[i].name}" for i in range(len(pdf_files))])
-                for aba, file in zip(abas, pdf_files):
-                    with aba:
-                        st.pdf(file.getvalue(), height=900)
+            abas = st.tabs([f"Recibo {pdf_files[i].name}" for i in range(len(pdf_files))])
+            for aba, file in zip(abas, pdf_files):
+                with aba:
+                    st.pdf(file.getvalue(), height=900)
+    # endregion
+    # ========================================================
 
+    # ========================================================
+    # region CONTRATOS
+    # ========================================================
+    contratos = [f for f in lista_unicos if 'contratos' in f.name]
+    df_contratos = []
+    if contratos:
         with st.expander('Contratos'):
-            pass
-            contratos = [f for f in lista_unicos if 'contratos' in f.name]
             df_contratos = load_xlsx(contratos)
+            df_contratos.fillna('', inplace=True)
             st.dataframe(df_contratos)
+    # endregion
+    # ========================================================
 
+    # ========================================================
+    # region PQ_MAQUINAS
+    # ========================================================
+    pq_maquinas = [f for f in lista_unicos if 'pq_maquinas' in f.name]
+    df_pq_maquinas = pd.DataFrame()
+    if pq_maquinas:
+        with st.expander('Parque de Máquinas'):
+            df_pq_maquinas = load_xlsx(pq_maquinas)
+            df_pq_maquinas = clear_df.clear_df_pq_maquinas(df_pq_maquinas)
+            st.session_state.df_pq_maquinas = df_pq_maquinas
+            st.dataframe(df_pq_maquinas)
+    # endregion
+    # ========================================================
+
+    # ========================================================
+    # region VALORES LOCACAO
+    # ========================================================
+    valores_locacao = [f for f in lista_unicos if f.name == "valores_locacao.xlsx"]
+    df_valores_locacao = pd.DataFrame()
+    if valores_locacao:
         with st.expander('Valores Locação'):
-    
-            valores_locacao = [f for f in lista_unicos if f.name == "valores_locacao.xlsx"]
-    
+
             df_valores_locacao = load_xlsx(valores_locacao)
             # 👇 CAPTURA O RETORNO
             df_editado = st.data_editor(
                 df_valores_locacao,
                 key="editor_valores_locacao"
             )
+
+            st.session_state.df_valores_locacao = df_valores_locacao
+            # st.rerun()  # Força a atualização da página para refletir as mudanças no DataFrame
+            # st.write(st.session_state.df_valores_locacao) #DEBUG
+            # st.session_state.df_valores_locacao = df_valores_locacao
 
             # 👇 BOTÃO DE SALVAR
             if not df_editado.equals(df_valores_locacao):
@@ -57,5 +105,12 @@ def arquivos_recebidos(arquivos):
                     file_name=f"valores_locacao.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
+    # endregion
+    # ========================================================
 
-        return lista_unicos, df_valores_locacao, df_contratos
+    # ========================================================
+    # region RETURN
+    # ========================================================
+    return lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos
+    # endregion
+    # ========================================================
