@@ -49,3 +49,8 @@ def load_css():
     # return 'Foo'
     with open (css_path) as f:
         st.html(f'<style>{f.read()}</style>')    
+
+def load_normal_itens_excel():
+
+    BASE_DIR = Path(__file__).parents[1]
+    return pd.read_excel(BASE_DIR/'assets'/'normal_itens.xlsx')

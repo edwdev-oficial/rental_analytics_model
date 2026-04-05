@@ -1,6 +1,8 @@
 import streamlit as st
+import pandas as pd
 from streamlit_option_menu import option_menu
 from rental_analytics_model.utils.loaders import logo_hilti_base64
+from rental_analytics_model.services.data_recibos import load_data_recibos
 
 def app():     
     # ==========================================
@@ -14,6 +16,8 @@ def app():
         st.session_state.df_valores_locacao = None
     if "df_contratos" not in st.session_state:
         st.session_state.df_contratos = None
+    if 'df_recibos' not in st.session_state:
+        st.session_state.df_recibos = pd.DataFrame()        
     # ==========================================
     # endregion
 
@@ -29,6 +33,8 @@ def app():
             st.session_state.df_pq_maquinas = df_pq_maquinas
             st.session_state.df_valores_locacao = df_valores_locacao
             st.session_state.df_contratos = df_contratos
+            st.session_state.df_recibos = load_data_recibos(lista_unicos, df_valores_locacao)
+            
 
     def configuracoes():
         from rental_analytics_model.pages import configuracoes

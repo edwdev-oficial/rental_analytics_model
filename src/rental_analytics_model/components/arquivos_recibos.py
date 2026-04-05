@@ -54,6 +54,7 @@ def arquivos_recebidos(arquivos):
         with st.expander('Contratos'):
             df_contratos = load_xlsx(contratos)
             df_contratos.fillna('', inplace=True)
+            st.write('df_contratos')
             st.dataframe(df_contratos)
     # endregion
     # ========================================================
@@ -81,6 +82,7 @@ def arquivos_recebidos(arquivos):
         with st.expander('Valores Locação'):
 
             df_valores_locacao = load_xlsx(valores_locacao)
+            st.write(df_valores_locacao)
             # 👇 CAPTURA O RETORNO
             df_editado = st.data_editor(
                 df_valores_locacao,

@@ -46,33 +46,29 @@ def load_modelos(familia):
     return modelos
 
 def show (lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos):
-    if 'df_recibos' not in st.session_state:
-        st.session_state.df_recibos = pd.DataFrame()
 
     if not len(lista_unicos):
         st.error('Carregue os arquivos...')
         st.stop()
 
-    df_recibos = load_data_recibos(lista_unicos, df_valores_locacao, df_contratos)
+    df_recibos = st.session_state.df_recibos.copy()
     if not df_recibos.empty:
-        st.session_state.df_recibos = df_recibos
-
-    familias = load_familias()
+        familias = load_familias()
 
 
-    familia = st.sidebar.selectbox(
-        'Familia',
-        familias,
-        index=0
-    )
+        familia = st.sidebar.selectbox(
+            'Familia',
+            familias,
+            index=0
+        )
 
-    modelos = load_modelos(familia)
+        modelos = load_modelos(familia)
 
-    modelo = st.sidebar.selectbox(
-        'Modelo',
-        modelos,
-        index=0
-    )
+        modelo = st.sidebar.selectbox(
+            'Modelo',
+            modelos,
+            index=0
+        )
 
-    show_dash(df_recibos, df_pq_maquinas, familia, modelo)
+        show_dash(df_recibos, df_pq_maquinas, familia, modelo)
 

@@ -9,19 +9,15 @@ from rental_analytics_model.utils.formaters import convert_col_df_moeda_br_str_t
 from rental_analytics_model.utils.loaders import load_normal_itens
 from rental_analytics_model.services.valores_locacao import load_xlsx
 
-def load_data_recibos(lista_unicos, df_valores_locacao, df_contratos):
-    pass
+def load_data_recibos(lista_unicos, df_valores_locacao):
+    
     valor_total_recibos = 0
     recibos = []
     df_recibos = pd.DataFrame()
 
-    # for file in lista_unicos:
-    #     st.write(file)
-
     pdf_files = [f for f in lista_unicos if f.type == "application/pdf"]
 
     if pdf_files:
-        # st.write(pdf_files)
         df_normal_itens = load_normal_itens()
 
         for arquivo in pdf_files:
@@ -106,6 +102,8 @@ def load_data_recibos(lista_unicos, df_valores_locacao, df_contratos):
                 on='Modelo',
                 how='left'
             )
+
+    df_recibos['Período'] = pd.to_datetime(df_recibos['Período'], format='%m/%Y')
 
     return df_recibos
 

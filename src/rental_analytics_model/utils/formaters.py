@@ -1,5 +1,9 @@
 import pandas as pd
 
+def br_num(x, casas=2):
+    s = f"{x:,.{casas}f}"
+    return s.replace(",", "X").replace(".", ",").replace("X", ".")
+
 def format_brl(valor, useBRL=False):
     if valor is None:
         return ""
