@@ -220,7 +220,7 @@ def show(
             }, inplace=True)
             df_base['Ocupação'] = df_base['Taxa de Ocupação'] * 100
             df_base['Markup'] = df_base['Faturamento'] / df_base['Custo G.F.']
-            df_base['Margem (%)'] = round((df_base['Faturamento'] - df_base['Custo G.F.']) / df_base['Faturamento'] * 100, 2)
+            df_base['Margem'] = round((df_base['Faturamento'] - df_base['Custo G.F.']) / df_base['Faturamento'] * 100, 2)
             df_base['Break Even'] = round(df_base['Custo G.F.'] / df_base['Potencial'] * 100, 2)
             st.write('df_base agrupado:')
             st.write(df_base)
@@ -250,12 +250,20 @@ def show(
         'Ocupação',
         'Faturamento',
         'Markup',
-        'Margem (%)',
+        'Margem',
     ]]
-    st.table(df_base_show, border="horizontal")
+    # st.table(df_base_show, border="horizontal")
+    df_base_show['Custo G.F.'] = df_base_show['Custo G.F.'].map(lambda x: formaters.br_num(x, 2))
+    df_base_show['Potencial'] = df_base_show['Potencial'].map(lambda x: formaters.br_num(x, 2))
+    df_base_show['Break Even'] = df_base_show['Break Even'].map(lambda x: f'{formaters.br_num(x, 2)}%')
+    df_base_show['Faturamento'] = df_base_show['Faturamento'].map(lambda x: formaters.br_num(x, 2))
+    df_base_show['Markup'] = df_base_show['Markup'].map(lambda x: formaters.br_num(x, 1))
+    df_base_show['Margem'] = df_base_show['Margem'].map(lambda x: f'{formaters.br_num(x, 2)}%')
+    table.personal_table(df_base_show)
     gerar_excel.dowload(df_base_show, 'ocupacao')
+    st.divider()
 
-    df_base_total = df_base_show[['Custo G.F.', 'Potencial', 'Faturamento']].sum().to_frame().T
+    df_base_total = df_base[['Custo G.F.', 'Potencial', 'Faturamento']].sum().to_frame().T
     df_base_total['Break Even'] = df_base_total['Custo G.F.'] / df_base_total['Potencial']
     df_base_total['Markup'] = df_base_total['Faturamento'] / df_base_total['Custo G.F.']
     df_base_total['Margem'] = (df_base_total['Faturamento'] - df_base_total['Custo G.F.']) / df_base_total['Faturamento']

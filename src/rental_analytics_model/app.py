@@ -59,7 +59,7 @@ def app():
         )
     def test_dev():
         from rental_analytics_model.pages import teste_dev
-        teste_dev.test()
+        teste_dev.test(st.session_state)
     # ==========================================
     # endregion
 
