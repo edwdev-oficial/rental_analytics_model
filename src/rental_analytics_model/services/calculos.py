@@ -29,9 +29,7 @@ def calcular_faturamento_frota(
     QUINZENAS_POSSIVEIS = 2 if dias_semana else 0
     MENSAL_POSSIVEL = 1 if dias_semana else 0
 
-
     df_calc = df
-
 
     if DISPONIBILIDADE is not None:
         df_calc["DISPONIBILIDADE"] = DISPONIBILIDADE
@@ -46,6 +44,8 @@ def calcular_faturamento_frota(
 
     # Potencial mensal por modalidade
     df_calc["potencial_dia"] = df_calc["dia"] * df_calc['intervalo_dias'] * df_calc["mix_dia"]
+
+
     df_calc["potencial_semana"] = df_calc["semana"] * SEMANAS_POSSIVEIS * df_calc["mix_semana"]
     df_calc["potencial_quinzena"] = df_calc["quinzena"] * QUINZENAS_POSSIVEIS * df_calc["mix_quinzena"]
     df_calc["potencial_mes"] = df_calc["mes"] * MENSAL_POSSIVEL * df_calc["mix_mes"]
@@ -58,10 +58,29 @@ def calcular_faturamento_frota(
         df_calc["potencial_mes"]
     )
 
+
     # Potencial total sem perdas
     df_calc["faturamento_potencial_total"] = (
         df_calc["Qt."] * df_calc["potencial_mensal_por_maquina"]
     )
+
+    df_calc = df_calc[[
+        'intervalo_dias',
+        'dia',
+        'semana',
+        'mix_dia',
+        'mix_semana',
+        'mix_quinzena',
+        'mix_mes',
+        'potencial_dia',
+        'potencial_semana',
+        'potencial_quinzena',
+        'potencial_mes',
+        'potencial_mensal_por_maquina',
+        'Qt.',
+        'faturamento_potencial_total'
+    ]]
+    # return df_calc
 
     # Após DISPONIBILIDADE
     df_calc["faturamento_apos_disponibilidade"] = (

@@ -1,10 +1,10 @@
 import pandas as pd
 import streamlit as st
 
-df_precos = st.session_state.df_valores_locacao.copy()
-df_precos = df_precos.set_index(df_precos.columns[0]).T
 
 def calcular_valor(row):
+    df_precos = st.session_state.df_valores_locacao.copy()
+    df_precos = df_precos.set_index(df_precos.columns[0]).T
     modelo = row['modelo']
     
     try:

@@ -17,6 +17,7 @@ from rental_analytics_model.services.data_recibos import load_data_recibos
 
 def test(session_state):
 
+
     from rental_analytics_model.services.data_recibos import load_data_recibos
     from rental_analytics_model.services.calcular_periodos import calcular_periodos_df
     from rental_analytics_model.services.calculos import calcular_faturamento_frota
@@ -27,12 +28,15 @@ def test(session_state):
     # ========================================================
     # region TITLE
     # ========================================================
-    st.title('Teste')
+    st.title('Teste Dev')
+    # endregion
+    # ========================================================
 
+    # ========================================================
+    # region EXPANDER SESSION.STATE
+    # ========================================================
     with st.expander('Sesseion State'):
         st.write(st.session_state)
-
-    st.divider()
     # endregion
     # ========================================================
 
@@ -103,7 +107,7 @@ def test(session_state):
 
         valor_gf = st.session_state.valor_gf
         # valor_gf = 300000
-        potencial_tot_faturamento = st.session_state.potencial_total_faturamento
+        potencial_tot_faturamento = st.session_state.Potencial_faturamento
         tx_disp = st.session_state.tx_disponibilidade / 100
         st.write(f'Valor G.F.: {formaters.format_brl(valor_gf)}')
         st.write(f'Potencial total de faturamento: {formaters.format_brl(potencial_tot_faturamento)}')
@@ -181,7 +185,7 @@ def test(session_state):
     # ========================================================
     def taxa_ocupacao(session_state):
 
-        st.subheader('Teste Taxa Ocupação', divider='red')
+        st.subheader('Teste Dev Indicadores Chaves', divider='red')
         
         # ========================================================
         # region RECIBOS
@@ -198,9 +202,9 @@ def test(session_state):
                 'Subtotal c/imp': 'sum'
             })
         )
-        st.write('Recibos agrupados')
-        st.dataframe(df_recibos_group)
-        st.divider()
+        # st.write('Recibos agrupados')
+        # st.dataframe(df_recibos_group)
+        # st.divider()
         # endregion
         # ========================================================
 
@@ -228,11 +232,80 @@ def test(session_state):
         df_contratos = session_state.df_contratos.copy()
         df_contratos = calcular_periodos_df(df_contratos)
         df_contratos['periodo'] = pd.to_datetime(df_contratos['locacao']).dt.to_period('M')
+        # endregion
+        # ========================================================
+
+        # ========================================================
+        # region FILTER CONTRATOS
+        # ========================================================
+        periodos = df_contratos['periodo'].unique().tolist()
+        familias = sorted(df_contratos['familia'].unique().tolist())
+        modelos = sorted(df_contratos['modelo'].unique().tolist())
 
 
-        # st.write('Contratos')
+        periodos_selected = st.sidebar.multiselect(
+            'Periodos',
+            options=periodos
+        )
+        
+        familias_selected = st.sidebar.multiselect(
+            'Familias',
+            options=familias
+        )
+        
+        modelos_selected = st.sidebar.multiselect(
+            'Modelos',
+            options=modelos
+        )
+
+        df_contratos = df_contratos[
+                (df_contratos['periodo'].isin(periodos_selected))
+                &
+                (df_contratos['familia'].isin(familias_selected))
+                &
+                (df_contratos['modelo'].isin(modelos_selected))
+            ]
+        
         # st.dataframe(df_contratos)
+        # endregion
+        # ========================================================
 
+        # ========================================================
+        # region FILTER CONTRATOS GROUP
+        # ========================================================
+        # periodos = df_contratos_group['periodo'].unique().tolist()
+        # familias = sorted(df_contratos_group['familia'].unique().tolist())
+        # modelos = sorted(df_contratos_group['modelo'].unique().tolist())
+        # # col1, col2, col3 = st.columns(3)
+        # # with col1:
+        # periodos_selected = st.sidebar.multiselect(
+        #     'Periodos',
+        #     options=periodos
+        # )
+        # # with col2:
+        # familias_selected = st.sidebar.multiselect(
+        #     'Familias',
+        #     options=familias
+        # )
+        # # with col3:
+        # modelos_selected = st.sidebar.multiselect(
+        #     'Modelos',
+        #     options=modelos
+        # )
+        # df_contratos_group = df_contratos_group[
+        #         (df_contratos_group['periodo'].isin(periodos_selected))
+        #         &
+        #         (df_contratos_group['familia'].isin(familias_selected))
+        #         &
+        #         (df_contratos_group['modelo'].isin(modelos_selected))
+        #     ]        
+        # endregion
+        # ========================================================        
+
+        # ========================================================
+        # region DF CONTRATOS GROUP
+        # ========================================================
+        df_contratos_group = df_contratos.copy()    
         df_contratos_group = (df_contratos
             .groupby(['periodo', 'familia', 'modelo'], as_index=False)
             .agg({
@@ -242,41 +315,7 @@ def test(session_state):
                 'semana': 'sum',
                 'mes':'sum',
             })
-        )
-
-        # ========================================================
-        # region FILTER
-        # ========================================================
-        periodos = df_contratos_group['periodo'].unique().tolist()
-        familias = sorted(df_contratos_group['familia'].unique().tolist())
-        modelos = sorted(df_contratos_group['modelo'].unique().tolist())
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            periodos_selected = st.multiselect(
-                'Periodos',
-                options=periodos
-            )
-        with col2:
-            familias_selected = st.multiselect(
-                'Familias',
-                options=familias
-            )
-        with col3:
-            modelos_selected = st.multiselect(
-                'Modelos',
-                options=modelos
-            )
-        df_contratos_group = df_contratos_group[
-                (df_contratos_group['periodo'].isin(periodos_selected))
-                &
-                (df_contratos_group['familia'].isin(familias_selected))
-                &
-                (df_contratos_group['modelo'].isin(modelos_selected))
-            ]        
-        # endregion
-        # ========================================================        
-
-
+        )        
         df_contratos_group = pd.merge(
             df_contratos_group, 
             df_recibos_group,
@@ -288,36 +327,6 @@ def test(session_state):
         df_contratos_group['dias_no_periodo'] = df_contratos_group['periodo'].dt.days_in_month
         df_contratos_group['dias_possiveis'] =  df_contratos_group['dias_no_periodo'] * df_contratos_group['Qt.']
         df_contratos_group['tx_disp'] = session_state.tx_disponibilidade / 100
-        df_contratos_group['tx_ocupacao'] = df_contratos_group['dias'] / df_contratos_group['dias_possiveis']
-        df_contratos_group['total_contratos'] = df_contratos_group[['dia', 'semana', 'quinzena', 'mes']].sum(axis=1)
-        df_contratos_group['mix_dia'] = df_contratos_group['dia'] / df_contratos_group['total_contratos']
-        df_contratos_group['mix_semana'] = df_contratos_group['semana'] / df_contratos_group['total_contratos']
-        df_contratos_group['mix_quinzena'] = df_contratos_group['quinzena'] / df_contratos_group['total_contratos']
-        df_contratos_group['mix_mes'] = df_contratos_group['mes'] / df_contratos_group['total_contratos']
-        df_contratos_group['sum_mix'] = (
-            df_contratos_group['mix_dia']
-            +
-            df_contratos_group['mix_semana'] * 7
-            +
-            df_contratos_group['mix_quinzena'] * 15
-            +
-            df_contratos_group['mix_mes'] * 30
-        )
-        df_contratos_group['dias_possiveis/sum_mix'] = df_contratos_group['dias_possiveis'] / df_contratos_group['sum_mix']
-        df_contratos_group['dias_real/sum_mix'] = df_contratos_group['dias'] / df_contratos_group['sum_mix']
-          
-        df_contratos_group['fator_dias_pot'] = df_contratos_group['mix_dia'] * df_contratos_group['dias_possiveis/sum_mix']
-        df_contratos_group['fator_semanas_pot'] = df_contratos_group['mix_semana'] * df_contratos_group['dias_possiveis/sum_mix']
-        df_contratos_group['fator_quinzenas_pot'] = df_contratos_group['mix_quinzena'] * df_contratos_group['dias_possiveis/sum_mix']
-        df_contratos_group['fator_meses_pot'] = df_contratos_group['mix_mes'] * df_contratos_group['dias_possiveis/sum_mix']
-        
-        df_contratos_group['fator_dias_real'] = df_contratos_group['mix_dia'] * df_contratos_group['dias_real/sum_mix']
-        df_contratos_group['fator_semanas_real'] = df_contratos_group['mix_semana'] * df_contratos_group['dias_real/sum_mix']
-        df_contratos_group['fator_quinzenas_real'] = df_contratos_group['mix_quinzena'] * df_contratos_group['dias_real/sum_mix']
-        df_contratos_group['fator_meses_real'] = df_contratos_group['mix_mes'] * df_contratos_group['dias_real/sum_mix']
-        # df_contratos_group['fator_meses_real'] = df_contratos_group['mix_mes'] * df_contratos_group['sum_mix / dias']
-
-
 
         df_contratos_group = pd.merge(
             df_contratos_group,
@@ -326,77 +335,163 @@ def test(session_state):
             how='left'
         )
 
-        # df_contratos_group['pot_dia'] = df_contratos_group['p_dia'] * df_contratos_group['fator_dias_pot']
-        # df_contratos_group['pot_semana'] = df_contratos_group['p_semana'] * df_contratos_group['fator_semanas_pot']
-        # df_contratos_group['pot_quinzena'] = df_contratos_group['p_quinzena'] * df_contratos_group['fator_quinzenas_pot']
-        # df_contratos_group['pot_mes'] = df_contratos_group['p_mes'] * df_contratos_group['fator_meses_pot']
-        # df_contratos_group['potencial_total'] = df_contratos_group[['pot_dia', 'pot_semana', 'pot_quinzena', 'pot_mes']].sum(axis=1)
+        df_contratos_group = (
+            df_contratos_group
+            .groupby(['modelo'], as_index=False)
+            .agg({
+                'Subtotal c/imp': 'sum',
+                'dias_possiveis': 'sum',
+                'dias': 'sum',
+                'dia': 'sum',
+                'semana': 'sum',
+                'quinzena': 'sum',
+                'mes': 'sum',
+                'p_dia': 'mean',
+                'p_semana': 'mean',
+                'p_quinzena': 'mean',
+                'p_mes': 'mean',
+            })
+        )
+        df_contratos_group['Tx Ocupação'] = df_contratos_group['dias'] / df_contratos_group['dias_possiveis']
+        df_contratos_group['mix_dia'] = df_contratos_group['dia'] / df_contratos_group['dias']
+        df_contratos_group['mix_semana'] = df_contratos_group['semana'] * 7 / df_contratos_group['dias']
+        df_contratos_group['mix_quinzena'] = df_contratos_group['quinzena'] * 15 / df_contratos_group['dias']
+        df_contratos_group['mix_mes'] = df_contratos_group['mes'] * 30 / df_contratos_group['dias']
+        # st.dataframe(df_contratos_group)
+        # from rental_analytics_model.utils.gerar_excel import dowload
+        # dowload(df_contratos_group, 'df_com_tx_ocupacao')
+        # endregion
+        # ========================================================
 
-        # df_contratos_group['real_dia'] = df_contratos_group['p_dia'] * df_contratos_group['fator_dias_real']
-        # df_contratos_group['real_semana'] = df_contratos_group['p_semana'] * df_contratos_group['fator_semanas_real']
-        # df_contratos_group['real_quinzena'] = df_contratos_group['p_quinzena'] * df_contratos_group['fator_quinzenas_real']
-        # df_contratos_group['real_mes'] = df_contratos_group['p_mes'] * df_contratos_group['fator_meses_real']
-        # df_contratos_group['real_total'] = df_contratos_group[['real_dia', 'real_semana', 'real_quinzena', 'real_mes']].sum(axis=1)
+        # ========================================================
+        # region DF CONTRATOS GROUP COM MIX MODALIDADE
+        # ========================================================
+        df_contratos_group2 = df_contratos_group.copy()
+        df_contratos_group2['total_contratos'] = df_contratos_group2[['dia', 'semana', 'quinzena', 'mes']].sum(axis=1)
+        df_contratos_group2['mix_dia'] = df_contratos_group2['dia'] / df_contratos_group2['total_contratos']
+        df_contratos_group2['mix_semana'] = df_contratos_group2['semana'] / df_contratos_group2['total_contratos']
+        df_contratos_group2['mix_quinzena'] = df_contratos_group2['quinzena'] / df_contratos_group2['total_contratos']
+        df_contratos_group2['mix_mes'] = df_contratos_group2['mes'] / df_contratos_group2['total_contratos']        
+        df_contratos_group2['sum_mix'] = (
+            df_contratos_group2['mix_dia']
+            +
+            df_contratos_group2['mix_semana'] * 7
+            +
+            df_contratos_group2['mix_quinzena'] * 15
+            +
+            df_contratos_group2['mix_mes'] * 30
+        )
 
-        df_contratos_group['mix_fat_dia'] = df_contratos_group['dia'] / df_contratos_group['dias']
-        df_contratos_group['mix_fat_semana'] = df_contratos_group['semana'] * 7 / df_contratos_group['dias']
-        df_contratos_group['mix_fat_quinzena'] = df_contratos_group['quinzena'] * 15 / df_contratos_group['dias']
-        df_contratos_group['mix_fat_mes'] = df_contratos_group['mes'] * 30 / df_contratos_group['dias']
+        # POTENCIAL   
+        df_contratos_group2['dias_possiveis/sum_mix'] = df_contratos_group2['dias_possiveis'] / df_contratos_group2['sum_mix']
+        df_contratos_group2['fator_dias_pot'] = df_contratos_group2['mix_dia'] * df_contratos_group2['dias_possiveis/sum_mix']
+        df_contratos_group2['fator_semanas_pot'] = df_contratos_group2['mix_semana'] * df_contratos_group2['dias_possiveis/sum_mix']
+        df_contratos_group2['fator_quinzenas_pot'] = df_contratos_group2['mix_quinzena'] * df_contratos_group2['dias_possiveis/sum_mix']
+        df_contratos_group2['fator_meses_pot'] = df_contratos_group2['mix_mes'] * df_contratos_group2['dias_possiveis/sum_mix']       
+        df_contratos_group2['pot_dia'] = df_contratos_group2['p_dia'] * df_contratos_group2['fator_dias_pot']
+        df_contratos_group2['pot_semana'] = df_contratos_group2['p_semana'] * df_contratos_group2['fator_semanas_pot']
+        df_contratos_group2['pot_quinzena'] = df_contratos_group2['p_quinzena'] * df_contratos_group2['fator_quinzenas_pot']
+        df_contratos_group2['pot_mes'] = df_contratos_group2['p_mes'] * df_contratos_group2['fator_meses_pot']
+        df_contratos_group2['Potencial'] = df_contratos_group2[['pot_dia', 'pot_semana', 'pot_quinzena', 'pot_mes']].sum(axis=1)
 
-        df_contratos_group['pot_dia'] = df_contratos_group['p_dia'] * df_contratos_group['dias_possiveis'] * df_contratos_group['mix_fat_dia']
-        df_contratos_group['pot_semana'] = df_contratos_group['p_semana'] * df_contratos_group['dias_possiveis'] / 7 * df_contratos_group['mix_fat_semana']
-        df_contratos_group['pot_quinzena'] = df_contratos_group['p_quinzena'] * df_contratos_group['dias_possiveis'] / 15 * df_contratos_group['mix_fat_quinzena']
-        df_contratos_group['pot_mes'] = df_contratos_group['p_mes'] * df_contratos_group['dias_possiveis'] / 30 * df_contratos_group['mix_fat_mes']
-        df_contratos_group['pot_total'] = df_contratos_group[['pot_dia', 'pot_semana', 'pot_quinzena', 'pot_mes']].sum(axis=1)
+        # REAL
+        df_contratos_group2['dias_real/sum_mix'] = df_contratos_group2['dias'] / df_contratos_group2['sum_mix']
+        df_contratos_group2['fator_dias_real'] = df_contratos_group2['mix_dia'] * df_contratos_group2['dias_real/sum_mix']
+        df_contratos_group2['fator_semanas_real'] = df_contratos_group2['mix_semana'] * df_contratos_group2['dias_real/sum_mix']
+        df_contratos_group2['fator_quinzenas_real'] = df_contratos_group2['mix_quinzena'] * df_contratos_group2['dias_real/sum_mix']
+        df_contratos_group2['fator_meses_real'] = df_contratos_group2['mix_mes'] * df_contratos_group2['dias_real/sum_mix']
+        df_contratos_group2['real_dia'] = df_contratos_group2['p_dia'] * df_contratos_group2['fator_dias_real']
+        df_contratos_group2['real_semana'] = df_contratos_group2['p_semana'] * df_contratos_group2['fator_semanas_real']
+        df_contratos_group2['real_quinzena'] = df_contratos_group2['p_quinzena'] * df_contratos_group2['fator_quinzenas_real']
+        df_contratos_group2['real_mes'] = df_contratos_group2['p_mes'] * df_contratos_group2['fator_meses_real']
+        df_contratos_group2['Faturamento'] = df_contratos_group2[['real_dia', 'real_semana', 'real_quinzena', 'real_mes']].sum(axis=1)        
+        
+        # st.dataframe(df_contratos_group2)
+        # endregion
+        # ========================================================
+
+        # ========================================================
+        # region DF CONTRATOS GROUP COM MIX FATURAMENTO
+        # ========================================================
+        # df_contratos_group['mix_fat_dia'] = df_contratos_group['dia'] / df_contratos_group['dias']
+        # df_contratos_group['mix_fat_semana'] = df_contratos_group['semana'] * 7 / df_contratos_group['dias']
+        # df_contratos_group['mix_fat_quinzena'] = df_contratos_group['quinzena'] * 15 / df_contratos_group['dias']
+        # df_contratos_group['mix_fat_mes'] = df_contratos_group['mes'] * 30 / df_contratos_group['dias']
+
+        # df_contratos_group['pot_dia'] = df_contratos_group['p_dia'] * df_contratos_group['dias_possiveis'] * df_contratos_group['mix_fat_dia']
+        # df_contratos_group['pot_semana'] = df_contratos_group['p_semana'] * df_contratos_group['dias_possiveis'] / 7 * df_contratos_group['mix_fat_semana']
+        # df_contratos_group['pot_quinzena'] = df_contratos_group['p_quinzena'] * df_contratos_group['dias_possiveis'] / 15 * df_contratos_group['mix_fat_quinzena']
+        # df_contratos_group['pot_mes'] = df_contratos_group['p_mes'] * df_contratos_group['dias_possiveis'] / 30 * df_contratos_group['mix_fat_mes']
+        df_contratos_group['pot_dia'] = df_contratos_group['p_dia'] * df_contratos_group['dias_possiveis'] * df_contratos_group['mix_dia']
+        df_contratos_group['pot_semana'] = df_contratos_group['p_semana'] * df_contratos_group['dias_possiveis'] / 7 * df_contratos_group['mix_semana']
+        df_contratos_group['pot_quinzena'] = df_contratos_group['p_quinzena'] * df_contratos_group['dias_possiveis'] / 15 * df_contratos_group['mix_quinzena']
+        df_contratos_group['pot_mes'] = df_contratos_group['p_mes'] * df_contratos_group['dias_possiveis'] / 30 * df_contratos_group['mix_mes']
+        df_contratos_group['Potencial'] = df_contratos_group[['pot_dia', 'pot_semana', 'pot_quinzena', 'pot_mes']].sum(axis=1)
 
         df_contratos_group['real_dia'] = df_contratos_group['dia'] * df_contratos_group['p_dia']
         df_contratos_group['real_semana'] = df_contratos_group['semana'] * df_contratos_group['p_semana']
         df_contratos_group['real_quinzena'] = df_contratos_group['quinzena'] * df_contratos_group['p_quinzena']
         df_contratos_group['real_mes'] = df_contratos_group['mes'] * df_contratos_group['p_mes']
-        df_contratos_group['real_total'] = df_contratos_group[['real_dia', 'real_semana', 'real_quinzena', 'real_mes']].sum(axis=1)
+        df_contratos_group['Faturamento'] = df_contratos_group[['real_dia', 'real_semana', 'real_quinzena', 'real_mes']].sum(axis=1)
+
+
         
         df_contratos_group.rename(columns={'Subtotal c/imp': 'Custo G.F.'}, inplace=True)
 
-        st.write('Contratos Agrupados')
-        st.dataframe(
-            df_contratos_group[[
-                'familia',
-                'modelo',
-                'periodo',
-                'Custo G.F.',
-                'dias_no_periodo',
-                'Qt.',
-                'dias_possiveis',
-                'dias',
-                'dia',
-                'semana',
-                'quinzena',
-                'mes',
-                'tx_disp',
-                'tx_ocupacao',
-                'p_dia',
-                'p_semana',
-                'p_quinzena',
-                'p_mes',
-                'mix_fat_dia',
-                'mix_fat_semana',
-                'mix_fat_quinzena',
-                'mix_fat_mes',
-                'pot_dia',
-                'pot_semana',   
-                'pot_quinzena',
-                'pot_mes',
-                'pot_total',
-                'real_dia',
-                'real_semana',
-                'real_quinzena',
-                'real_mes',
-                'real_total'
-            ]]
-        )
+        # endregion
+        # ========================================================
 
+        # ========================================================
+        # region STATUS OCUPAÇÃO
+        # ========================================================
+        def status_ocupacao(row):
+            ocup_break_even = row['Break Even']
+            ocup = row['Tx Ocupação']
 
+            if ocup >= ocup_break_even * 2:
+                return f'🟢 {ocup:.2f}%'
+            elif ocup > ocup_break_even:
+                return f'🟡 {ocup:.2f}%'
+            else:
+                return f'🔴 {ocup:.2f}%'
+        # endregion
+        # ========================================================
 
+        # ========================================================
+        # region RESULTADOS
+        # ========================================================
+        df_resultados = df_contratos_group.copy()
+        df_resultados['Modelo'] = df_resultados['modelo']
+        df_resultados['Break Even'] = df_resultados['Custo G.F.'] / df_resultados['Potencial'] * 100
+        df_resultados['Markup'] = df_resultados['Faturamento'] / df_resultados['Custo G.F.']
+        df_resultados['Margem'] = (df_resultados['Faturamento'] - df_resultados['Custo G.F.']) / df_resultados['Faturamento'] * 100
+        df_resultados['Tx Ocupação'] = df_resultados['Tx Ocupação'] * 100
+        df_resultados['Tx Ocupação'] = df_resultados.apply(status_ocupacao, axis=1)
+        df_resultados['Custo G.F.'] = df_resultados['Custo G.F.'].map(lambda x: formaters.br_num(x, 2))
+        df_resultados['Potencial'] = df_resultados['Potencial'].map(lambda x: formaters.br_num(x, 2))
+        df_resultados['Break Even'] = df_resultados['Break Even'].map(lambda x: f'{formaters.br_num(x, 2)}%')
+        df_resultados['Faturamento'] = df_resultados['Faturamento'].map(lambda x: formaters.br_num(x, 2))
+        df_resultados['Markup'] = df_resultados['Markup'].map(lambda x: f'{formaters.br_num(x, 2)}%')
+        df_resultados['Margem'] = df_resultados['Margem'].map(lambda x: f'{formaters.br_num(x, 2)}%')
+        df_resultados = df_resultados[[
+            'Modelo',
+            'Custo G.F.',
+            'Potencial',
+            'Break Even',
+            'Tx Ocupação',
+            'Faturamento',
+            'Markup',
+            'Margem'
+        ]]
+        from rental_analytics_model.components import table
+        st.subheader('Resultados')
+        table.personal_table(df_resultados)
+        # endregion
+        # ========================================================
+
+        # ========================================================
+        # region CALCULO POTENCIAL TOTAL
+        # ========================================================
         df_pot_total = df_contratos_group[[
             'Custo G.F.',
             'dias_possiveis',
@@ -406,10 +501,7 @@ def test(session_state):
             'quinzena',
             'mes'
         ]].sum(skipna=True).to_frame().T
-
-        # st.dataframe(df_pot_total)
-
-        df_pot_total['tx_ocupacao'] = df_pot_total['dias'] / df_pot_total['dias_possiveis']
+        df_pot_total['Tx Ocupação'] = df_pot_total['dias'] / df_pot_total['dias_possiveis']
         df_pot_total['preco_dia'] = df_contratos_group['p_dia'].mean()
         df_pot_total['preco_semana'] = df_contratos_group['p_semana'].mean()
         df_pot_total['preco_quinzena'] = df_contratos_group['p_quinzena'].mean()
@@ -422,82 +514,236 @@ def test(session_state):
         df_pot_total['pot_semana'] = df_pot_total['preco_semana'] * df_pot_total['dias_possiveis'] / 7 * df_pot_total['mix_fat_semana'] 
         df_pot_total['pot_quinzena'] = df_pot_total['preco_quinzena'] * df_pot_total['dias_possiveis'] / 15 * df_pot_total['mix_fat_quinzena'] 
         df_pot_total['pot_mes'] = df_pot_total['preco_mes'] * df_pot_total['dias_possiveis'] / 30 * df_pot_total['mix_fat_mes'] 
-        df_pot_total['pot_total'] = df_pot_total[['pot_dia', 'pot_semana', 'pot_quinzena', 'pot_mes']].sum(axis=1)
-        df_pot_total['real_total'] = df_pot_total['pot_total'] * df_pot_total['tx_ocupacao']
+        df_pot_total['Potencial'] = df_pot_total[['pot_dia', 'pot_semana', 'pot_quinzena', 'pot_mes']].sum(axis=1)
+        df_pot_total['Faturamento'] = df_pot_total['Potencial'] * df_pot_total['Tx Ocupação']
+        # st.dataframe(df_pot_total)
+        # st.divider()
+        # endregion
+        # ========================================================
 
-        st.dataframe(df_pot_total)
-
-
-        st.divider()
-
-        df_resumo = df_pot_total[['Custo G.F.', 'pot_total', 'tx_ocupacao', 'real_total']].sum(skipna=True).to_frame().T
-        # df_resumo['ocup x pot'] = df_resumo['tx_ocupacao'] * df_resumo['pot_total']
-        df_resumo['Markup'] = df_resumo['real_total'] / df_resumo['Custo G.F.']
-        df_resumo['Margem'] = (df_resumo['real_total'] - df_resumo['Custo G.F.']) / df_resumo['real_total'] * 100
-
-        def br_num(x, casas=2):
-            s = f"{x:,.{casas}f}"
-            return s.replace(",", "X").replace(".", ",").replace("X", ".")
-
+        # ========================================================
+        # region RESUMO E DF EXIBIR RESUMO
+        # ========================================================
+        df_resumo = df_pot_total[['Custo G.F.', 'Potencial', 'Tx Ocupação', 'Faturamento']].sum(skipna=True).to_frame().T
+        df_resumo['Markup'] = df_resumo['Faturamento'] / df_resumo['Custo G.F.']
+        df_resumo['Margem'] = (df_resumo['Faturamento'] - df_resumo['Custo G.F.']) / df_resumo['Faturamento'] * 100
         df_exibir = df_resumo.copy()
-        df_exibir["tx_ocupacao"] = df_exibir["tx_ocupacao"] * 100
-        df_exibir['Break Even'] = df_exibir['Custo G.F.'] / df_exibir['pot_total'] * 100
+        df_exibir["Tx Ocupação"] = df_exibir["Tx Ocupação"] * 100
+        df_exibir['Break Even'] = df_exibir['Custo G.F.'] / df_exibir['Potencial'] * 100
+        df_exibir['Tx Ocupação'] = df_exibir.apply(status_ocupacao, axis=1)
         df_exibir["Break Even"] = df_exibir["Break Even"].map(lambda x: f'{formaters.br_num(x, 2)}%')
         df_exibir["Margem"] = df_exibir["Margem"].map(lambda x: f'{formaters.br_num(x, 2)}%')
-        df_exibir["tx_ocupacao"] = df_exibir["tx_ocupacao"].map(lambda x: f'{formaters.br_num(x, 2)}%')
+        # df_exibir["Tx Ocupação"] = df_exibir["Tx Ocupação"].map(lambda x: f'{formaters.br_num(x, 2)}%')
         df_exibir['Custo G.F.'] = df_exibir['Custo G.F.'].map(lambda x: formaters.br_num(x, 2))
         df_exibir['Markup'] = df_exibir['Markup'].map(lambda x: formaters.br_num(x, 2))
-        df_exibir['pot_total'] = df_exibir['pot_total'].map(lambda x: formaters.br_num(x, 2))
-        df_exibir['real_total'] = df_exibir['real_total'].map(lambda x: formaters.br_num(x, 2))
-
-        df_exibir.rename(columns={
-                'real_total': 'Faturamento',
-                'pot_total': 'Potencial',
-                'tx_ocupacao': 'Tx Ocupação'
-            },
-            inplace=True
-        )
-
+        df_exibir['Potencial'] = df_exibir['Potencial'].map(lambda x: formaters.br_num(x, 2))
+        df_exibir['Faturamento'] = df_exibir['Faturamento'].map(lambda x: formaters.br_num(x, 2))
         df_exibir = df_exibir[['Custo G.F.', 'Potencial', 'Break Even', 'Tx Ocupação', 'Faturamento', 'Markup', 'Margem' ]]
 
-        st.write('Resumo dos resultados')
-        st.dataframe(
-            df_exibir,
-            hide_index=True,
-            use_container_width=True
-        )
-
-        # # # endregion
-        # # # ========================================================
-
-        # # # st.write(df_contratos_group.dtypes)
-
-
-        # # # # calculos
-        # # # qtd_maquinas = df_qtd_by_linha_modelo['Qt.'].sum()
-        # # # date_start = df_contratos['locacao'].min()
-        # # # date_end = df_contratos['locacao'].max()
-        # # # qtd_meses = (date_end.year - date_start.year) * 12 + (date_end.month - date_start.month) + 1
-        # # # dias_uteis = qtd_meses * 26
-        # # # capacidade_total = qtd_maquinas * dias_uteis
-        # # # disponibilidade = .8
-        # # # capacidade_disponivel = capacidade_total * disponibilidade
-        # # # dias_locados = df_contratos['dias'].sum()
-        # # # tx_ocupacao = dias_locados / capacidade_disponivel
-
-        # # # st.subheader('Resumo')
-        # # # st.write(f'Qtd máquinas: {qtd_maquinas}')
-        # # # st.write(f'Dias úteis: {dias_uteis}')
-        # # # st.write(f'Capacidade total: {capacidade_total}')
-        # # # st.write(f'Disponibilidade: {disponibilidade * 100}%')
-        # # # st.write(f'Capacidade disponível: {capacidade_disponivel}')
-        # # # st.write(f'Taxa de ocupação: {tx_ocupacao * 100}%')
-
-        # # # st.write(f'Total de período em dias: {total_periodo_dias}')
+        st.subheader('Resultados Agrupados')
+        table.personal_table(df_exibir)
+        # endregion
+        # ========================================================
 
     # endregion
     # ========================================================
-    taxa_ocupacao(session_state)
+    # taxa_ocupacao(session_state)
+
+    # ========================================================
+    # region SIMULADOR
+    # ========================================================
+    def simulador(sessiton_state):
+        st.subheader('Indicadores Chaves', divider='red')
+
+        # ========================================================
+        # region DF RECIBOS
+        # ========================================================
+        df_recibos = session_state.df_recibos.copy()
+        df_recibos.rename(columns={'Linha': 'familia', 'Modelo': 'modelo'}, inplace=True)
+        # df_recibos = df_recibos[df_recibos['familia'] == 'Rompedor']
+        df_recibos['periodo'] = pd.to_datetime(df_recibos['Período']).dt.to_period('M')
+        df_recibos_group = (
+            df_recibos
+            .groupby(['periodo','familia', 'modelo'], as_index=False)
+            .agg({
+                'Qt.': 'sum',
+                'Subtotal c/imp': 'sum'
+            })
+        )
+        # st.write('Recibos agrupados')
+        # st.dataframe(df_recibos_group)
+        # st.divider()
+        # endregion
+        # ========================================================
+
+        # ========================================================
+        # region DF VALORES LOCACAO
+        # ========================================================        
+        df_valores_locacao = st.session_state.df_valores_locacao.copy()
+        df_valores_locacao.rename(columns={
+                'Modelo': 'modelo',
+                'dia': 'p_dia',
+                'semana': 'p_semana',
+                'quinzena': 'p_quinzena',
+                'mes': 'p_mes'
+            }, inplace=True)
+        # st.write('Valores Locação')
+        # st.dataframe(df_valores_locacao)
+        # st.divider()
+        # endregion
+        # ========================================================        
+
+        # ========================================================
+        # region DF CONTRATOS
+        # ========================================================
+        df_contratos = st.session_state.df_contratos.copy()
+        df_contratos['periodo'] = pd.to_datetime(df_contratos['locacao']).dt.to_period('M')
+        df_contratos['dias_mes'] = df_contratos['periodo'].dt.days_in_month
+        df_contratos = calcular_periodos_df(df_contratos)
+        # st.dataframe(df_contratos)
+        # endregion
+        # ========================================================
+
+        # ========================================================
+        # region FILTER CONTRATOS
+        # ========================================================
+        periodos = df_contratos['periodo'].unique().tolist()
+        familias = sorted(df_contratos['familia'].unique().tolist())
+        modelos = sorted(df_contratos['modelo'].unique().tolist())
+
+
+        periodos_selected = st.sidebar.multiselect(
+            'Periodos',
+            options=periodos
+        )
+        
+        familias_selected = st.sidebar.multiselect(
+            'Familias',
+            options=familias
+        )
+        
+        modelos_selected = st.sidebar.multiselect(
+            'Modelos',
+            options=modelos
+        )
+
+        df_contratos = df_contratos[
+                (df_contratos['periodo'].isin(periodos_selected))
+                &
+                (df_contratos['familia'].isin(familias_selected))
+                &
+                (df_contratos['modelo'].isin(modelos_selected))
+            ]
+        # endregion
+        # ========================================================
+
+        # region DF CONTRATOS GROUP
+        # ========================================================
+        df_contratos_group = df_contratos.copy()    
+        df_contratos_group = (df_contratos
+            .groupby(['periodo', 'dias_mes', 'familia', 'modelo'], as_index=False)
+            .agg({
+                'dias': 'sum',
+                'dia': 'sum',
+                'quinzena': 'sum',
+                'semana': 'sum',
+                'mes':'sum',
+            })
+        )
+
+
+        df_contratos_group = pd.merge(
+            df_contratos_group, 
+            df_recibos_group,
+            on=['periodo', 'familia', 'modelo'],
+            how='left',
+
+        )
+
+
+        df_contratos_group['dias_no_periodo'] = df_contratos_group['periodo'].dt.days_in_month
+        df_contratos_group['dias_possiveis'] =  df_contratos_group['dias_no_periodo'] * df_contratos_group['Qt.']
+        df_contratos_group['tx_disp'] = session_state.tx_disponibilidade / 100
+
+        df_contratos_group = pd.merge(
+            df_contratos_group,
+            df_valores_locacao,
+            on=['modelo'],
+            how='left'
+        )
+
+
+        df_contratos_group = (
+            df_contratos_group
+            .groupby(['periodo', 'dias_mes', 'modelo'], as_index=False)
+            .agg({
+                'Qt.': 'sum',
+                'Subtotal c/imp': 'sum',
+                'dias_possiveis': 'sum',
+                'dias': 'sum',
+                'dia': 'sum',
+                'semana': 'sum',
+                'quinzena': 'sum',
+                'mes': 'sum',
+                'p_dia': 'mean',
+                'p_semana': 'mean',
+                'p_quinzena': 'mean',
+                'p_mes': 'mean',
+            })
+        )
+
+
+        df_contratos_group['tx_ocupacao'] = df_contratos_group['dias'] / df_contratos_group['dias_possiveis']
+        df_contratos_group['total_contratos'] = df_contratos_group[['dia', 'semana', 'quinzena', 'mes']].sum(axis=1)
+        df_contratos_group['mix_dia'] = df_contratos_group['dia'] / df_contratos_group['total_contratos']
+        df_contratos_group['mix_semana'] = df_contratos_group['semana'] / df_contratos_group['total_contratos']
+        df_contratos_group['mix_quinzena'] = df_contratos_group['quinzena'] / df_contratos_group['total_contratos']
+        df_contratos_group['mix_mes'] = df_contratos_group['mes'] / df_contratos_group['total_contratos']
+        # st.dataframe(df_contratos_group)
+        # endregion
+        # ========================================================        
+
+        # ========================================================
+        # region DF CALCULAR
+        # ========================================================
+        df_contratos_calcular = df_contratos_group.copy()
+        df_contratos_calcular = df_contratos_calcular[[
+            'modelo',
+            'Subtotal c/imp',
+            'periodo',
+            'Qt.',
+            'dias_mes',
+            'tx_ocupacao',
+            'mix_dia',
+            'mix_semana',
+            'mix_quinzena',
+            'mix_mes',
+            'p_dia',
+            'p_semana',
+            'p_quinzena',
+            'p_mes',
+            'dias_possiveis',
+        ]]
+
+        df_contratos_calcular.insert(df_contratos_calcular.columns.get_loc('tx_ocupacao'), 'tx_disp', 1)
+
+        from rental_analytics_model.services import calcular_indicadores_chave
+
+        df_calculado, df_total = calcular_indicadores_chave.calc(df_contratos_calcular)
+
+        from rental_analytics_model.components import table
+        table.personal_table(df_calculado)
+        from rental_analytics_model.utils.gerar_excel import dowload
+        dowload(df_contratos_calcular, 'contratos_calcular')
+
+        st.divider()
+        table.personal_table(df_total)
+        # endregion
+        # ========================================================
+
+    # endregion
+    # ========================================================
+    # simulador(session_state)
 
     # ========================================================
     # region FILTER_TEST
@@ -725,10 +971,10 @@ def test(session_state):
         st.write(f'total_1 == total_2', f'✅{total_1 == total_2}' )  # ✅ True        
 
         # mix_dia_ponderado = (df['mix_dia'] * df['peso']).sum() / df['peso'].sum()
-        # pot_total = df['pot_dia'].sum()
+        # Potencial = df['pot_dia'].sum()
 
         # st.write('Taxa ponderada:', mix_dia_ponderado)
-        # st.write(f'{pot_total:,.2f}')
+        # st.write(f'{Potencial:,.2f}')
 
 
     # endregion
@@ -740,9 +986,22 @@ def test(session_state):
     # ========================================================
     def recibos_gf():
         df = st.session_state.df_recibos.copy()
-        # st.dataframe(df)
+        df = df[df['Descrição'].str.contains('700')]
+        st.dataframe(df)
         valor_total = df['Subtotal c/imp'].sum()
         st.write(f'Total dos contratos: {valor_total:,.2f}')
+
+        # df_group_modelo = df.groupby(['Descrição'])['Qt.'].sum().reset_index()
+        df_group_modelo = (
+            df
+            .groupby(['Período', 'Modelo'])
+            .agg({
+                'Qt.': 'sum',
+                'Subtotal c/imp': 'sum'
+            })
+            .reset_index()
+        )
+        st.dataframe(df_group_modelo)
 
         # df_group_periodo = df.groupby('Período')['Subtotal c/imp'].sum()
         df_group_periodo = (
@@ -772,7 +1031,7 @@ def test(session_state):
         )
 
 
-        # st.plotly_chart(fig)
+        st.plotly_chart(fig)
 
     # endregion
     # ========================================================
@@ -853,3 +1112,5 @@ def test(session_state):
     # endregion
     # ========================================================
     # table_estyle()
+
+

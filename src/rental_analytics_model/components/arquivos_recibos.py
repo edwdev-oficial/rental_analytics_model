@@ -49,7 +49,7 @@ def arquivos_recebidos(arquivos):
     # region CONTRATOS
     # ========================================================
     contratos = [f for f in lista_unicos if 'contratos' in f.name]
-    df_contratos = []
+    df_contratos = pd.DataFrame()
     if contratos:
         with st.expander('Contratos'):
             df_contratos = load_xlsx(contratos)

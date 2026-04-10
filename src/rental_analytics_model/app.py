@@ -46,7 +46,10 @@ def app():
             st.session_state.df_pq_maquinas,
             st.session_state.df_valores_locacao,
             st.session_state.df_contratos
-        )        
+        )
+    def indicadores_chaves():
+        from rental_analytics_model.pages import indicadores_chaves
+        indicadores_chaves.show()
 
     def dashboard_executivo():
         from rental_analytics_model.pages import dashboard_executivo
@@ -73,6 +76,7 @@ def app():
                 "Carregar Dados",
                 "Configurações",
                 "Taxa de Ocupação",
+                "Indicadores Chaves",
                 "Dashboard Executivo",
                 "---",
                 "Teste Dev"
@@ -81,6 +85,7 @@ def app():
                 "database-fill-down",
                 "gear-fill",
                 "bar-chart-fill",
+                "file-earmark-bar-graph-fill",
                 "speedometer",
                 None,
                 "tools"
@@ -117,6 +122,7 @@ def app():
         "Carregar Dados": carregar_dados,
         "Configurações": configuracoes,
         "Taxa de Ocupação": taxa_ocupacao,
+        "Indicadores Chaves": indicadores_chaves,
         "Dashboard Executivo": dashboard_executivo,
         "Teste Dev": test_dev
     }

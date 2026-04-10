@@ -251,13 +251,15 @@ def show_dash(df, df_pq_maquinas, familia, modelo):
     # =========================================================
     # region INDICADORES DERIVADOS
     # =========================================================
+    # st.write(df_group_filter_by_linha_modelo.to_dict(orient='records'))
     df_faturamento = calculos.calcular_faturamento_frota(
         df_group_filter_by_linha_modelo,
         tx_disp_use[1],
         tx_ocup_use[1],
         st.session_state.dias_semana
     )
-    st.write(df_faturamento)
+    # st.write(df_faturamento.to_dict(orient='records'))
+    # st.write(f'Faturamento potencial total: {formaters.br_num(df_faturamento['faturamento_potencial_total'].sum())}')
     # endregion
     # =========================================================
 
