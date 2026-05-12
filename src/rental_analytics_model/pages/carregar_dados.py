@@ -10,7 +10,7 @@ def show():
     files.extend(uploaded_files)
 
     if files:
-        lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos = arquivos_recebidos(files)
-        return lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos
+        lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos, df_ams_dash = arquivos_recebidos(files)
+        return lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos, df_ams_dash
     
-    return None, None, None, None
+    return None, None, None, None, None

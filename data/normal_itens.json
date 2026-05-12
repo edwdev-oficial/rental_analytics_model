@@ -166,5 +166,23 @@
     "Tipo": "Ferramenta",
     "Linha": "Desbastadora",
     "Modelo": "DGH-130"
+  },
+  {
+    "Descrição": "Carreg. bateria C 4/36-90 220V caixa",
+    "Tipo": "Acessório",
+    "Linha": "Carregador",
+    "Modelo": "C 4\/36-90"
+  },
+  {
+    "Descrição": "Martelo perf. TE 1 220V caixa",
+    "Tipo": "Ferramenta",
+    "Linha": "Martelete",
+    "Modelo": "TE-1"
+  },
+  {
+    "Descrição": "Dust extractor VC 40LX 220-240V",
+    "Tipo": "Ferramenta",
+    "Linha": "Aspirador",
+    "Modelo": "VC 40LX"
   }
 ]

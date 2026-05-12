@@ -78,9 +78,12 @@ def load_data_recibos(lista_unicos, df_valores_locacao):
                         }
                         recibos.append(parsed_item)
                 # endregion
-                # ========================================================        
+                # ========================================================
         
         df_recibos = pd.DataFrame(recibos)
+
+        # import streamlit as st
+        # st.session_state.df_recibos_row = df_recibos
 
 
         df_recibos = convert_col_df_moeda_br_str_to_number(df_recibos, ['Valor s/imp', 'Valor c/imp', 'Subtotal s/imp', 'Mensal s/imp'])
@@ -96,14 +99,29 @@ def load_data_recibos(lista_unicos, df_valores_locacao):
             how='left'
         )
 
+        import streamlit as st
+        st.session_state.df_recibos_row = df_recibos
+
+        df_recibos['Período'] = pd.to_datetime(df_recibos['Período'], format='%m/%Y')
+        df_recibos.rename(columns={'Linha': 'familia', 'Modelo': 'modelo'}, inplace=True)
+        df_recibos['periodo'] = pd.to_datetime(df_recibos['Período']).dt.to_period('M')        
+
         if not df_valores_locacao.empty:
+            df_valores_locacao.rename(columns={'Modelo': 'modelo'}, inplace=True)
             df_recibos = df_recibos.merge(
-                df_valores_locacao[['Modelo', 'dia', 'semana', 'quinzena', 'mes']],
-                on='Modelo',
+                df_valores_locacao[['modelo', 'dia', 'semana', 'quinzena', 'mes']],
+                on='modelo',
                 how='left'
             )
 
-    df_recibos['Período'] = pd.to_datetime(df_recibos['Período'], format='%m/%Y')
+            df_recibos = (
+                df_recibos
+                .groupby(['Razão Social', 'periodo', 'Tipo', 'familia', 'modelo', 'dia', 'semana', 'quinzena', 'mes'], as_index=False)
+                .agg({
+                    'Qt.': 'sum',
+                    'Subtotal c/imp': 'sum'
+                })
+            )
 
     return df_recibos
 

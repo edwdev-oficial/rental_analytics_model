@@ -97,3 +97,11 @@ section[data-testid="stSidebar"] {
     /* background-color: var(--COLOR_DARK); */
     min-height: 30rem;
 }
+
+p.detalhe_dataframe {
+    font-size: 14px;
+    font-style: italic;
+    text-align: right;
+    margin-top: 0;
+    color: red;
+}

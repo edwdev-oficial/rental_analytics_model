@@ -45,6 +45,7 @@ def calc(df):
         .groupby(['familia', 'modelo'])
         .agg(
             {
+                'Subtotal c/imp': 'sum',
                 'dias_possiveis': 'sum',
                 'dias_loc': 'sum',
                 'diarias': 'sum',
@@ -69,9 +70,15 @@ def calc(df):
     df_check_group['pot_quinzena'] = df_check_group['dias_possiveis'] / df_check_group['sum_mix'] * df_check_group['mix_quinzena'] * df_check_group['p_quinzena']
     df_check_group['pot_mes'] = df_check_group['dias_possiveis'] / df_check_group['sum_mix'] * df_check_group['mix_mes'] * df_check_group['p_mes']
     df_check_group['pot_total'] = df_check_group[['pot_dia', 'pot_semana', 'pot_quinzena', 'pot_mes']].sum(axis=1)
+    df_check_group['fat_dia'] = df_check_group['diarias'] * df_check_group['p_dia']
+    df_check_group['fat_semana'] = df_check_group['semanas'] * df_check_group['p_semana']
+    df_check_group['fat_quinzena'] = df_check_group['quinzenas'] * df_check_group['p_quinzena']
+    df_check_group['fat_mes'] = df_check_group['meses'] * df_check_group['p_mes']
+    df_check_group['fat_total'] = df_check_group[['fat_dia', 'fat_semana', 'fat_quinzena', 'fat_mes']].sum(axis=1)
+
 
     df = (
-        df
+        df_check_group
         .groupby(['familia', 'modelo'])
         .agg({
             'Subtotal c/imp': 'sum',
@@ -129,4 +136,7 @@ def calc(df):
     df_total['Break Even'] = df_total['Break Even'].map(lambda x: f'{br_num(x, 2)}%' )
     df_total['Lucro Bruto'] = df_total['Lucro Bruto'].map(lambda x: br_num(x, 2) )
 
-    return df_check, df, df_total
+
+    return df_check, df_check_group, df, df_total
+
+    # return df, 'foo'

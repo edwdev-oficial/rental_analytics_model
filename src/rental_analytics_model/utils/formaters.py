@@ -13,7 +13,6 @@ def format_brl(valor, useBRL=False):
         
     return f"{valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     
-
 def convert_moeda_br_str_to_number(value):
    return float(value.replace('.', '').replace(',', '.'))
 
@@ -45,3 +44,6 @@ def convert_col_df_number_to_moeda_br(df, colunas):
         )
 
     return df
+
+def date_br(date):
+    return date.strftime('%d/%m/%Y')

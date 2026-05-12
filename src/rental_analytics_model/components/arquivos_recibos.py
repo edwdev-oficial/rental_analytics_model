@@ -7,7 +7,10 @@ import pandas as pd
 import streamlit as st
 from src.rental_analytics_model.services.valores_locacao import load_xlsx
 
-from rental_analytics_model.services import clear_df
+from rental_analytics_model.services import (
+    clear_df,
+    calcular_periodos
+)
 
 # endregion
 # ========================================================
@@ -56,6 +59,9 @@ def arquivos_recebidos(arquivos):
             df_contratos.fillna('', inplace=True)
             st.write('df_contratos')
             st.dataframe(df_contratos)
+        df_contratos = calcular_periodos.calcular_periodos_df(df_contratos)
+        df_contratos['periodo'] = pd.to_datetime(df_contratos['locacao']).dt.to_period('M')
+        df_contratos['dias_mes'] = df_contratos['periodo'].dt.days_in_month
     # endregion
     # ========================================================
 
@@ -82,7 +88,7 @@ def arquivos_recebidos(arquivos):
         with st.expander('Valores Locação'):
 
             df_valores_locacao = load_xlsx(valores_locacao)
-            st.write(df_valores_locacao)
+            # st.write(df_valores_locacao)
             # 👇 CAPTURA O RETORNO
             df_editado = st.data_editor(
                 df_valores_locacao,
@@ -111,8 +117,21 @@ def arquivos_recebidos(arquivos):
     # ========================================================
 
     # ========================================================
+    # region DF AMS DASH
+    # ========================================================
+    data_ams_dashboard = [f for f in lista_unicos if 'ams_report_brazil' in f.name ]
+    df_ams_dash = pd.DataFrame()
+    if data_ams_dashboard:
+        df_ams_dash = load_xlsx(data_ams_dashboard)
+        with st.expander('AMS Dashboard'):
+            st.write(data_ams_dashboard[0].name)
+            st.dataframe(df_ams_dash)
+    # endregion
+    # ========================================================
+
+    # ========================================================
     # region RETURN
     # ========================================================
-    return lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos
+    return lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos, df_ams_dash
     # endregion
     # ========================================================

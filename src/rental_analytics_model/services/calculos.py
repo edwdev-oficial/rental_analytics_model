@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 
+from rental_analytics_model.services import(
+    calcular_potencial
+)
+
 # =========================================================
 # CÁLCULO PRINCIPAL
 # =========================================================
@@ -60,11 +64,16 @@ def calcular_faturamento_frota(
 
 
     # Potencial total sem perdas
+    # df_calc["faturamento_potencial_total"] = (
+    #     df_calc["Qt."] * df_calc["potencial_mensal_por_maquina"]
+    # )
     df_calc["faturamento_potencial_total"] = (
-        df_calc["Qt."] * df_calc["potencial_mensal_por_maquina"]
+        # df_calc["Qt."] * df_calc["potencial_mensal_por_maquina"]
+        calcular_potencial.calcular()
     )
 
     df_calc = df_calc[[
+        'modelo',
         'intervalo_dias',
         'dia',
         'semana',
@@ -84,19 +93,23 @@ def calcular_faturamento_frota(
 
     # Após DISPONIBILIDADE
     df_calc["faturamento_apos_disponibilidade"] = (
-        df_calc["faturamento_potencial_total"] * df_calc["DISPONIBILIDADE"]
+        # df_calc["faturamento_potencial_total"] * df_calc["DISPONIBILIDADE"]
+        df_calc["faturamento_potencial_total"] * DISPONIBILIDADE
     )
 
     # Faturamento real
     df_calc["faturamento_real"] = (
         df_calc["faturamento_potencial_total"] *
-        df_calc["DISPONIBILIDADE"] *
-        df_calc["OCUPACAO"]
+        # df_calc["DISPONIBILIDADE"] *
+        # df_calc["OCUPACAO"]
+        DISPONIBILIDADE * 
+        OCUPACAO
     )
 
     # Utilização econômica
     df_calc["Utilizacao_Economica"] = (
-        df_calc["DISPONIBILIDADE"] * df_calc["OCUPACAO"]
+        # df_calc["DISPONIBILIDADE"] * df_calc["OCUPACAO"]
+        DISPONIBILIDADE * OCUPACAO
     )
 
     df_calc['gap_operacional'] = df_calc['faturamento_potencial_total'] - df_calc['faturamento_apos_disponibilidade']

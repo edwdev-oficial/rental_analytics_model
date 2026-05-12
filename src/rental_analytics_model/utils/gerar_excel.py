@@ -1,6 +1,7 @@
 import streamlit as st
+import pandas as pd
 
-def dowload(df, name):
+def dowload(df: pd.DataFrame, name: str):
     @st.cache_data
     def gerar_excel(df):
         import io
@@ -14,4 +15,4 @@ def dowload(df, name):
         label="Baixar Excel",
         data=buffer,
         file_name=f"{name}.xlsx"
-    )        
+    )

@@ -12,7 +12,7 @@ def load_familias():
         familias.extend(sorted(
             list(
                 st.session_state.df_recibos[st.session_state.df_recibos['Tipo'] == 'Ferramenta']
-                ['Linha']
+                ['familia']
                 .unique()
             )
         ))
@@ -30,8 +30,8 @@ def load_modelos(familia):
     if not st.session_state.df_recibos.empty:
         modelos.extend(sorted(
             list(
-                st.session_state.df_recibos[st.session_state.df_recibos['Linha'] == familia]
-                ['Modelo']
+                st.session_state.df_recibos[st.session_state.df_recibos['familia'] == familia]
+                ['modelo']
                 .unique()
             )
         ))
@@ -54,7 +54,6 @@ def show (lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos):
     df_recibos = st.session_state.df_recibos.copy()
     if not df_recibos.empty:
         familias = load_familias()
-
 
         familia = st.sidebar.selectbox(
             'Familia',

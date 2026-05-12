@@ -17,7 +17,9 @@ def app():
     if "df_contratos" not in st.session_state:
         st.session_state.df_contratos = None
     if 'df_recibos' not in st.session_state:
-        st.session_state.df_recibos = pd.DataFrame()        
+        st.session_state.df_recibos = pd.DataFrame()   
+    if 'df_ams_dash' not in st.session_state:
+        st.session_state.df_ams_dash = pd.DataFrame()             
     # ==========================================
     # endregion
 
@@ -27,15 +29,15 @@ def app():
     def carregar_dados():
         pass
         from rental_analytics_model.pages import carregar_dados
-        lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos = carregar_dados.show()
+        lista_unicos, df_pq_maquinas, df_valores_locacao, df_contratos, df_ams_dash = carregar_dados.show()
         if lista_unicos is not None:
             st.session_state.files = lista_unicos
             st.session_state.df_pq_maquinas = df_pq_maquinas
             st.session_state.df_valores_locacao = df_valores_locacao
             st.session_state.df_contratos = df_contratos
             st.session_state.df_recibos = load_data_recibos(lista_unicos, df_valores_locacao)
+            # st.session_state.df_ams_dash = df_ams_dash
             
-
     def configuracoes():
         from rental_analytics_model.pages import configuracoes
         configuracoes.show()
@@ -53,7 +55,6 @@ def app():
 
     def dashboard_executivo():
         from rental_analytics_model.pages import dashboard_executivo
-        # st.write(st.session_state.df_pq_maquinas) #DEBUG
         dashboard_executivo.show(
             st.session_state.files,
             st.session_state.df_pq_maquinas,
@@ -75,20 +76,20 @@ def app():
             [
                 "Carregar Dados",
                 "Configurações",
-                "Taxa de Ocupação",
+                # "Taxa de Ocupação",
                 "Indicadores Chaves",
                 "Dashboard Executivo",
-                "---",
-                "Teste Dev"
+                # "---",
+                # "Teste Dev"
             ],
             icons=[
                 "database-fill-down",
                 "gear-fill",
-                "bar-chart-fill",
+                # "bar-chart-fill",
                 "file-earmark-bar-graph-fill",
                 "speedometer",
-                None,
-                "tools"
+                # None,
+                # "tools"
                 ""
             ],
             default_index=0

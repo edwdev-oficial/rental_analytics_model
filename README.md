@@ -25,3 +25,23 @@ exemplo:
 |familia|modelo|dia|semana|quinzena|mes|
 |:---|:---:|:---:|:---:|:---:|---:|
 |rompedor|TE-500|160|300|390|570|
+
+---
+
+### Cálculo do Potencial de Faturamento
+Descrever aqui...
+Precisa ser estimado com base em:
+1.  Pq de máquinas
+    1.  pode ser obtido dos recibos de G.F. - Neste caso trata-se do potência de faturamento das máquinas de G.F.
+    2.  Pode ser obtido dos recibos de G.F. + Pq de máquinas HOL selecionando as ferramentas próprias - Neste caso trata-se do potência de faturmanto de todo o Parque.
+2.  DFs necessários:
+    1.  df_recibos ou df_recibos + df_pq_maquinas
+    2.  df_contratos_locacao para obtenção do mix, caso não exista, o mix será utilizado pelos sliders, assim o que estará sendo analisado é a simulação de diversos cenários ou a taxa de disponibilidade + taxa de ocupação informados pelo cliente.
+    3.  df_valores_locação - Preços praticados pelo cliente.
+
+---
+### Perguntas a serem respondidas
+1.  O que é melhor, reduzir custos ou aumentar a demanda?
+2.  Oque acontece com o lucro se o faturmanto aumenta 1 p.p.?
+3.  O que acontece com o lucro se o custo reduz 1 p.p.?
+
