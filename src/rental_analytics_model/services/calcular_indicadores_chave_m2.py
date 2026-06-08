@@ -103,8 +103,8 @@ def calc(df):
     df.insert(df.columns.get_loc('Faturamento'), 'Taxa de Ocupação', df['Faturamento'] / df['Potencial'] * 100)
     df.insert(df.columns.get_loc('Taxa de Ocupação'), 'Break Even', df['Custo G.F.'] / df['Potencial'] * 100)
     df['Markup'] = df['Faturamento'] / df['Custo G.F.']
-    with st.expander('DF Calculado'):
-        st.dataframe(df)
+    # with st.expander('DF Calculado'):
+    #     st.dataframe(df)
     df['Margem'] = (df['Faturamento'] - df['Custo G.F.']) / df['Faturamento'] * 100
     df['Taxa de Ocupação'] = df.apply(status_ocupacao, axis=1)
     df['Lucro Bruto'] = df['Faturamento'] - df['Custo G.F.']

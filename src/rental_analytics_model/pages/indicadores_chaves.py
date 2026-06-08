@@ -748,8 +748,8 @@ def show():
         'dias_possiveis',
     ]]
     df_contratos_calcular.insert(df_contratos_calcular.columns.get_loc('tx_ocupacao'), 'tx_disp', 1)
-    with st.expander('df_contratos_calcular'):
-        st.dataframe(df_contratos_calcular)
+    # with st.expander('df_contratos_calcular'):
+    #     st.dataframe(df_contratos_calcular)
     # endregion
     # ========================================================
 
@@ -763,7 +763,7 @@ def show():
 
 
     df_check, df_check_group, df_calculado, df_total = calcular_indicadores_chave_m2.calc(df_contratos_calcular)
-    st.dataframe(df_check_group)
+    # st.dataframe(df_check_group)
 
     df_calculado['prefixo'] = df_calculado['Modelo'].str.extract(r'([A-Za-z]+(?:-[A-Za-z]+)?)')
     df_calculado['numero'] = df_calculado['Modelo'].str.extract(r'(\d+)').astype(int)

@@ -57,7 +57,7 @@ def arquivos_recebidos(arquivos):
         with st.expander('Contratos'):
             df_contratos = load_xlsx(contratos)
             df_contratos.fillna('', inplace=True)
-            st.write('df_contratos')
+            # st.write('df_contratos')
             st.dataframe(df_contratos)
         df_contratos = calcular_periodos.calcular_periodos_df(df_contratos)
         df_contratos['periodo'] = pd.to_datetime(df_contratos['locacao']).dt.to_period('M')
