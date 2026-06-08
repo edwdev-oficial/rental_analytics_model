@@ -75,20 +75,20 @@ def app():
             "Menu",
             [
                 "Carregar Dados",
-                "Configurações",
+                # "Configurações",
                 # "Taxa de Ocupação",
                 "Indicadores Chaves",
-                "Dashboard Executivo",
-                # "---",
+                # "Dashboard Executivo",
+                "---",
                 # "Teste Dev"
             ],
             icons=[
                 "database-fill-down",
-                "gear-fill",
+                # "gear-fill",
                 # "bar-chart-fill",
                 "file-earmark-bar-graph-fill",
-                "speedometer",
-                # None,
+                # "speedometer",
+                None,
                 # "tools"
                 ""
             ],

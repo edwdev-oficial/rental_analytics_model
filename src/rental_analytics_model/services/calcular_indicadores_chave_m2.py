@@ -1,6 +1,9 @@
 import pandas as pd
+import streamlit as st
 
 def calc(df):
+
+    # st.dataframe(df)
 
     from rental_analytics_model.utils.formaters import br_num
 
@@ -20,7 +23,6 @@ def calc(df):
     # endregion
     # ========================================================
 
-    df['dias_possiveis'] = df['Qt.'] * df['dias_mes']
     df['dias_loc'] = df['dias_possiveis'] * df['tx_ocupacao']
     df['sum_mix'] = df['mix_dia'] + df['mix_semana'] * 7 + df['mix_quinzena'] * 15 + df['mix_mes'] * 30
     df['contratos'] = (df['dias_loc'] / df['sum_mix']).fillna(0)
@@ -60,6 +62,9 @@ def calc(df):
             },
         ).reset_index()
     )
+
+
+
     df_check_group['mix_dia'] = (df_check_group['diarias'] / df_check_group['contratos']).fillna(0)
     df_check_group['mix_semana'] = (df_check_group['semanas'] / df_check_group['contratos']).fillna(0)
     df_check_group['mix_quinzena'] = (df_check_group['quinzenas'] / df_check_group['contratos']).fillna(0)
@@ -87,16 +92,19 @@ def calc(df):
         }).reset_index()
     )
 
+
     df.rename(columns={
         'modelo': 'Modelo',
         'Subtotal c/imp': 'Custo G.F.',
         'pot_total': 'Potencial',
         'fat_total': 'Faturamento'
     }, inplace=True)
-
+            
     df.insert(df.columns.get_loc('Faturamento'), 'Taxa de Ocupação', df['Faturamento'] / df['Potencial'] * 100)
     df.insert(df.columns.get_loc('Taxa de Ocupação'), 'Break Even', df['Custo G.F.'] / df['Potencial'] * 100)
     df['Markup'] = df['Faturamento'] / df['Custo G.F.']
+    with st.expander('DF Calculado'):
+        st.dataframe(df)
     df['Margem'] = (df['Faturamento'] - df['Custo G.F.']) / df['Faturamento'] * 100
     df['Taxa de Ocupação'] = df.apply(status_ocupacao, axis=1)
     df['Lucro Bruto'] = df['Faturamento'] - df['Custo G.F.']
